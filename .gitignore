@@ -1,0 +1,5 @@
+.codex-skill-sync.lock
+sync.log
+*.tmp
+__pycache__/
+*.pyc
