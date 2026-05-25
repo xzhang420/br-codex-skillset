@@ -1,0 +1,4 @@
+interface:
+  display_name: "Personal Automation Maintenance"
+  short_description: "Maintain personal Codex automations."
+  default_prompt: "Update a personal automation prompt and, when available, ask the app to run it once manually."
