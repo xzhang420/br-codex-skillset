@@ -1,0 +1,3 @@
+display_name: Codex Device Onboarding
+short_description: Set up a new computer for shared Codex skill sync.
+default_prompt: Help me add a new computer to my shared Codex skills/settings sync setup.
