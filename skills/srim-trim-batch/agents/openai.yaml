@@ -1,0 +1,4 @@
+interface:
+  display_name: "SRIM TRIM Batch"
+  short_description: "Run iterative SRIM/TRIM simulations safely from PowerShell."
+  default_prompt: "Set up and run an iterative SRIM/TRIM batch simulation."

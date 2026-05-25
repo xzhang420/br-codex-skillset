@@ -1,0 +1,4 @@
+interface:
+  display_name: "Operando Neutron Workflow"
+  short_description: "Set up, debug, and plot operando neutron imaging workflows."
+  default_prompt: "Use this skill to configure operando notebook paths, debug TIFF/reference correction issues, process neutron imaging runs, and produce consistent plots or summaries."
