@@ -1,0 +1,43 @@
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+
+[marketplaces.openai-primary-runtime]
+last_updated = "2026-05-25T05:13:58Z"
+source_type = "local"
+source = '\\?\C:\Users\X\.cache\codex-runtimes\codex-primary-runtime\plugins\openai-primary-runtime'
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."github@openai-curated"]
+enabled = true
+
+[windows]
+sandbox = "elevated"
+
+[projects.'c:\users\x\documents\codex\2026-04-25\windows-11-microsoft-store']
+trust_level = "trusted"
+
+[projects.'c:\users\x\documents\codex\2026-05-02\status']
+trust_level = "trusted"
+
+[projects.'c:\users\x\documents\codex\2026-05-23\are-the-codex-chat-histories-local']
+trust_level = "trusted"
+
+[projects.'c:\users\x\documents\codex\2026-05-25\i-am-using-codex-on-3']
+trust_level = "trusted"
+
+[projects.'c:\users\x\documents\codex\2026-05-25\can-you-browse-through-my-c']
+trust_level = "trusted"
+
+[desktop]
+ambient-suggestions-enabled = true
+localeOverride = "en-US"
+conversationDetailMode = "STEPS_COMMANDS"
