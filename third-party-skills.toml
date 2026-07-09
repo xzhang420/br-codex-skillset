@@ -22,6 +22,37 @@ preserve_rules = [
   "Run git diff --check after preparing any candidate update."
 ]
 
+[[skills]]
+name = "humanizer"
+local_path = "skills/humanizer"
+upstream_url = "https://github.com/blader/humanizer"
+source_type = "github"
+tracking = "default-branch-or-release"
+current_source = "local copy imported before 2026-07-09; exact upstream commit unknown"
+
+preserve_rules = [
+  "Keep only the top-level Codex skill at skills/humanizer.",
+  "Preserve the Hermes Agent port metadata when syncing source files.",
+  "Keep upstream LICENSE when syncing source files.",
+  "Run git diff --check after preparing any candidate update."
+]
+
+[[skills]]
+name = "jupyter-live-kernel"
+local_path = "skills/jupyter-live-kernel"
+upstream_url = "https://github.com/hamelsmu/hamelnb"
+source_type = "github-subdir"
+upstream_subdir = "skills/jupyter-live-kernel"
+tracking = "default-branch-or-release"
+current_source = "local copy imported before 2026-07-09; exact upstream commit unknown"
+
+preserve_rules = [
+  "Keep only the top-level Codex skill at skills/jupyter-live-kernel.",
+  "Preserve local Codex-compatible instructions when syncing from the hamelnb skill subdirectory.",
+  "Do not vendor notebooks, Jupyter runtime state, or local kernel connection files.",
+  "Run git diff --check after preparing any candidate update."
+]
+
 [[collections]]
 name = "nature-skills"
 upstream_url = "https://github.com/Yuan1z0825/nature-skills"
