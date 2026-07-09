@@ -18,7 +18,7 @@ function Invoke-RobocopyNoOverwrite {
         [string]$Destination
     )
 
-    & robocopy $Source $Destination /E /XC /XN /XO
+    & robocopy $Source $Destination /E /XC /XN /XO /XD (Join-Path $Source ".system")
     if ($LASTEXITCODE -gt 7) {
         throw "robocopy failed with exit code $LASTEXITCODE"
     }
@@ -71,7 +71,7 @@ if ($DevicePrefix) {
     Write-Host "This computer is $DevicePrefix. It owns skill folders whose names start with skills/$DevicePrefix-. When creating or editing skills from this device's workflow review, only create or edit skills with that prefix unless the user explicitly approves editing another folder."
 }
 
-Invoke-Git add skills
+Invoke-Git add -- .gitignore AGENTS.md config.toml scripts skills ":!skills/.system/**"
 $cached = git diff --cached --quiet
 if ($LASTEXITCODE -ne 0) {
     Invoke-Git commit -m "Add Codex skills from $env:COMPUTERNAME"

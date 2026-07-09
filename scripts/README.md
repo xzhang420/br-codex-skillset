@@ -41,7 +41,7 @@ If GitHub rejects the push, run `gh auth login` or configure a personal access t
 ## What The Scripts Do
 
 - Pull the latest shared repo.
-- Merge existing local `~/.codex/skills` into the repo without overwriting repo files.
+- Merge existing local `~/.codex/skills` into the repo without overwriting repo files, while skipping Codex-managed `.system` skills.
 - Back up the old local skills folder.
 - Link `~/.codex/skills` to the shared repo's `skills` folder.
 - Commit and push any newly imported local skills.

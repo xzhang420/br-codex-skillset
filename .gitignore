@@ -3,3 +3,6 @@ sync.log
 *.tmp
 __pycache__/
 *.pyc
+
+# Codex refreshes system skills locally; do not sync them through this repo.
+skills/.system/

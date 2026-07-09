@@ -1,0 +1,73 @@
+# Third-party Codex skills mirrored into this repo.
+# The biweekly update automation reads this file, checks upstreams, and reports
+# candidate updates. Third-party entries may be auto-applied and pushed only by the primary update device when all guardrails pass.
+
+primary_update_device = "personal"
+third_party_update_policy = "primary-device-auto-apply-and-push"
+own_skill_update_policy = "manual-confirm-before-commit-or-push"
+other_device_policy = "pull-shared-repo-only"
+
+[[skills]]
+name = "frontend-slides"
+local_path = "skills/frontend-slides"
+upstream_url = "https://github.com/zarazhangrui/frontend-slides"
+source_type = "github"
+tracking = "default-branch-or-release"
+current_source = "local copy imported before 2026-07-09; exact upstream commit unknown"
+
+preserve_rules = [
+  "Keep only the top-level Codex skill at skills/frontend-slides.",
+  "Do not reintroduce .claude-plugin or plugins/frontend-slides nested packaging.",
+  "Keep upstream LICENSE and README when syncing source files.",
+  "Run git diff --check after preparing any candidate update."
+]
+
+[[collections]]
+name = "nature-skills"
+upstream_url = "https://github.com/Yuan1z0825/nature-skills"
+source_type = "github-collection"
+upstream_subdir = "skills"
+tracking = "default-branch-or-release"
+current_source = "local copy imported in commit 17ad0ed (Add Codex skills from second computer); exact upstream commit unknown"
+
+local_paths = [
+  "skills/nature-academic-search",
+  "skills/nature-citation",
+  "skills/nature-data",
+  "skills/nature-figure",
+  "skills/nature-paper2ppt",
+  "skills/nature-polishing",
+  "skills/nature-reader",
+  "skills/nature-response",
+  "skills/nature-writing"
+]
+
+upstream_skills_observed = [
+  "skills/_shared",
+  "skills/nature-academic-search",
+  "skills/nature-citation",
+  "skills/nature-data",
+  "skills/nature-downloader",
+  "skills/nature-experiment-log",
+  "skills/nature-figure",
+  "skills/nature-literature-pipeline",
+  "skills/nature-paper-to-patent",
+  "skills/nature-paper2ppt",
+  "skills/nature-polishing",
+  "skills/nature-proposal-writer",
+  "skills/nature-reader",
+  "skills/nature-ref-verifier",
+  "skills/nature-response",
+  "skills/nature-reviewer",
+  "skills/nature-statistics",
+  "skills/nature-writing"
+]
+
+preserve_rules = [
+  "Keep nature skills as separate top-level skill folders under skills/ so Codex can discover each SKILL.md.",
+  "Treat this entry as one upstream collection for update checks and reporting; do not list each member as a separate third-party upstream unless it diverges.",
+  "Do not automatically add new upstream nature-* skills; report newly available upstream skills and ask before importing them.",
+  "Do not delete local nature-* skills just because the upstream collection changes; propose a prune plan first.",
+  "Only add skills/_shared if an imported or updated local skill references it.",
+  "Run git diff --check after preparing any candidate update."
+]

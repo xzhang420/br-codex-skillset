@@ -31,9 +31,13 @@ if [[ -e "$codex_skills" || -L "$codex_skills" ]]; then
   else
     echo "Merging existing local skills into repo without overwriting existing repo files..."
     if command -v rsync >/dev/null 2>&1; then
-      rsync -a --ignore-existing "$codex_skills/" "$repo_skills/"
+      rsync -a --ignore-existing --exclude '/.system/' "$codex_skills/" "$repo_skills/"
     else
-      cp -an "$codex_skills/." "$repo_skills/"
+      for entry in "$codex_skills"/* "$codex_skills"/.[!.]* "$codex_skills"/..?*; do
+        [[ -e "$entry" ]] || continue
+        [[ "$(basename "$entry")" == ".system" ]] && continue
+        cp -an "$entry" "$repo_skills/"
+      done
     fi
 
     echo "Backing up existing Codex skills folder to $backup"
@@ -50,7 +54,7 @@ if [[ -n "$device_prefix" ]]; then
   echo "This computer is $device_prefix. It owns skill folders whose names start with skills/$device_prefix-. When creating or editing skills from this device's workflow review, only create or edit skills with that prefix unless the user explicitly approves editing another folder."
 fi
 
-git add skills
+git add -- .gitignore AGENTS.md config.toml scripts skills ':!skills/.system/**'
 if ! git diff --cached --quiet; then
   git commit -m "Add Codex skills from $(hostname)"
   git pull --rebase

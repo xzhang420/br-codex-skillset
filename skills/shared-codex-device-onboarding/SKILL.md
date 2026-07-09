@@ -9,7 +9,7 @@ Use this skill when adding a new computer to the user's Codex skills/settings sy
 
 ## Source Of Truth
 
-The shared private repo is:
+The shared private repo is the source of truth for user-maintained skills. Codex-managed system skills under `skills/.system/` are local runtime state and should not be committed. The repo is:
 
 ```text
 https://github.com/xzhang420/br-codex-skillset
@@ -73,7 +73,7 @@ Replace `DEVICE-PREFIX` with the chosen prefix.
 The bootstrap script:
 
 - pulls the latest repo
-- merges existing local Codex skills into the repo without overwriting repo files
+- merges existing local user-maintained Codex skills into the repo without overwriting repo files, while skipping `.system`
 - backs up the old local skills folder
 - links `~/.codex/skills` or `%USERPROFILE%\.codex\skills` to the repo
 - commits and pushes imported skills
@@ -92,9 +92,15 @@ This computer is DEVICE-PREFIX. It owns skill folders whose names start with ski
 Also include:
 
 ```text
-Before changing skills, run git pull --rebase --autostash in the shared br-codex-skillset repo. After creating or editing skills, run git add skills config.toml AGENTS.md, commit with a concise message, run git pull --rebase, and push. If there is a conflict or authentication failure, stop and report it. Never force-push.
+Before changing skills, run git pull --rebase --autostash in the shared br-codex-skillset repo. After creating or editing skills, stage only portable files and exclude skills/.system, commit with a concise message, run git pull --rebase, and push. If there is a conflict or authentication failure, stop and report it. Never force-push.
 ```
 
 ## Safety
 
-Never sync the whole `.codex` directory. Never commit auth files, sessions, logs, SQLite state files, caches, sandbox files, plugin caches, or local backups.
+Register mirrored third-party skills in `third-party-skills.toml`. A GitHub repository URL is enough when the skill lives at the repository root; add notes or preserve rules when only a subdirectory should be synced or local cleanup is required.
+
+Never sync the whole `.codex` directory. Never commit auth files, sessions, logs, SQLite state files, caches, sandbox files, plugin caches, local backups, or `skills/.system/`.
+
+## Third-Party Skill Updates
+
+Only the primary update device should follow third-party upstreams listed in `third-party-skills.toml`. Other devices should pull the shared repo and should not independently update third-party upstreams. User-maintained skills require explicit user confirmation before commit or push.
