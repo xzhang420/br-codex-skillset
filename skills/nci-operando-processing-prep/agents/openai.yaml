@@ -1,0 +1,4 @@
+interface:
+  display_name: "NCI - Operando Processing - Prep"
+  short_description: "Prepare NCI operando configs and beam-history paths."
+  default_prompt: "Use this skill to switch neutron capture imaging operando configs to a new experiment, validate paths, and report TPX time ranges before processing."

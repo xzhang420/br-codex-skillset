@@ -1,11 +1,13 @@
 ---
-name: operando-neutron-workflow
-description: Configure, debug, and extend operando neutron imaging workflows built around operando_pipeline.ipynb, operando_config.ini, and the C:\Software\toolbox\operando Python modules. Use when the user asks to set experiment paths, process exp### data, run OBINT/reference/background correction, diagnose TIFF or notebook errors, skip bad neutron images, plot potential/thickness/event images, label subplots/events, or package repeated operando GUI/notebook steps.
+name: nci-operando-processing-workflow
+description: Run, debug, and extend downstream NCI (neutron capture imaging) operando processing workflows built around operando_pipeline.ipynb, operando_config.ini, reconstructed NCI TIFF folders, electrochemistry files, and the C:\Software\toolbox\operando Python modules. Use for NCI notebook execution, OBINT/reference/background correction, bad TIFF handling, and potential/thickness/event plots when the user explicitly refers to NCI or neutron capture imaging.
 ---
 
-# Operando Neutron Workflow
+# NCI - Operando Processing - Workflow
 
 ## Workflow
+
+This skill applies only to NCI, meaning neutron capture imaging, and only after the detector event stream has already been reconstructed into NCI TIFF images or image folders used by the operando notebooks. Do not use this skill for neutron radiography data or conventional transmission radiography workflows. If the task is about acquisition or the upstream event-reconstruction layer, work directly with the TPX3/Lumacam acquisition and reduction scripts instead of using this workflow.
 
 1. Establish the active workspace and experiment before editing:
    - Notebook path, usually `operando_pipeline.ipynb`.
@@ -22,6 +24,7 @@ description: Configure, debug, and extend operando neutron imaging workflows bui
 
 ### Experiment Path Setup
 
+- For simple NCI experiment switching, beam-history matching, and path validation before running the notebook, use `nci-operando-processing-prep` first.
 - Read the GUI setup cell and `operando_config.ini`.
 - Update the config to point at the requested experiment first, rather than editing many notebook cells.
 - Check for related paths: raw image directory, OB/open-beam images, dark/background images, corrected output directory, electrochemistry file, and plot output directory.
@@ -50,7 +53,7 @@ description: Configure, debug, and extend operando neutron imaging workflows bui
 
 ## Safety Checks
 
-- Do not delete raw neutron images or original electrochemistry data.
+- Do not delete raw NCI images or original electrochemistry data.
 - Make shared toolbox edits narrowly, because multiple notebooks may import the same modules.
 - Before bulk output cleanup, confirm the resolved target directory is the intended corrected/output folder.
 - If a user asks why a patch did not take effect, check whether the notebook kernel has stale imports before editing again.

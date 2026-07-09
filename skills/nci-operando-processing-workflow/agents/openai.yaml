@@ -1,0 +1,4 @@
+interface:
+  display_name: "NCI - Operando Processing - Workflow"
+  short_description: "Run, debug, and plot NCI operando processing workflows."
+  default_prompt: "Use this skill for neutron capture imaging operando notebook execution, correction debugging, bad TIFF handling, and potential, thickness, or event plotting."
