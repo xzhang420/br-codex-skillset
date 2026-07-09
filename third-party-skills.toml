@@ -102,3 +102,139 @@ preserve_rules = [
   "Only add skills/_shared if an imported or updated local skill references it.",
   "Run git diff --check after preparing any candidate update."
 ]
+
+[[skills]]
+name = "a-stock-data"
+local_path = "skills/a-stock-data"
+upstream_url = "https://github.com/simonlin1212/a-stock-data"
+source_type = "github"
+tracking = "default-branch-or-release"
+current_source = "main at bcda4054b979166a3d06b628f16f3dc9b1ff7eb2, downloaded 2026-07-09"
+
+preserve_rules = [
+  "Keep the repository-root skill at skills/a-stock-data.",
+  "Preserve upstream LICENSE, README.md, CHANGELOG.md, assets, and embedded code examples.",
+  "Do not install Python dependencies automatically during an upstream sync.",
+  "Run git diff --check after preparing any candidate update."
+]
+
+[[skills]]
+name = "global-stock-data"
+local_path = "skills/global-stock-data"
+upstream_url = "https://github.com/simonlin1212/global-stock-data"
+source_type = "github"
+tracking = "default-branch-or-release"
+current_source = "main at d52a8a0013363577bceb28ca876c88fe6c1a5aeb, downloaded 2026-07-09"
+
+preserve_rules = [
+  "Keep the repository-root skill at skills/global-stock-data.",
+  "Preserve upstream LICENSE, README.md, CHANGELOG.md, assets, and embedded code examples.",
+  "Do not install Python dependencies automatically during an upstream sync.",
+  "Run git diff --check after preparing any candidate update."
+]
+
+[[collections]]
+name = "google-deepmind-science-skills"
+upstream_url = "https://github.com/google-deepmind/science-skills"
+source_type = "github-collection"
+upstream_subdir = "skills"
+tracking = "default-branch-or-release"
+current_source = "main at 0b42509800f49e6eb7809505d96e20a890ef99bd, downloaded 2026-07-09"
+
+local_paths = [
+  "skills/alphafold_database_fetch_and_analyze",
+  "skills/alphagenome_single_variant_analysis",
+  "skills/chembl_database",
+  "skills/clinical_trials_database",
+  "skills/clinvar_database",
+  "skills/credentials",
+  "skills/dbsnp_database",
+  "skills/embl_ebi_ols",
+  "skills/encode_ccres_database",
+  "skills/ensembl_database",
+  "skills/foldseek_structural_search",
+  "skills/gnomad_database",
+  "skills/gtex_database",
+  "skills/human_protein_atlas_database",
+  "skills/interpro_database",
+  "skills/jaspar_database",
+  "skills/literature_search_arxiv",
+  "skills/literature_search_biorxiv",
+  "skills/literature_search_europepmc",
+  "skills/literature_search_openalex",
+  "skills/ncbi_sequence_fetch",
+  "skills/openfda_database",
+  "skills/opentargets_database",
+  "skills/pdb_database",
+  "skills/predictingthepast",
+  "skills/protein_sequence_msa",
+  "skills/protein_sequence_similarity_search",
+  "skills/pubchem_database",
+  "skills/pubmed_database",
+  "skills/pymol",
+  "skills/quickgo_database",
+  "skills/reactome_database",
+  "skills/string_database",
+  "skills/ucsc_conservation_and_tfbs",
+  "skills/unibind_database",
+  "skills/uniprot_database",
+  "skills/uv",
+  "skills/workflow_skill_creator"
+]
+
+support_paths = [
+  "third-party-licenses/google-deepmind-science-skills/LICENSE",
+  "third-party-licenses/google-deepmind-science-skills/SKILL_LICENSES.md"
+]
+
+upstream_skills_observed = [
+  "skills/alphafold_database_fetch_and_analyze",
+  "skills/alphagenome_single_variant_analysis",
+  "skills/chembl_database",
+  "skills/clinical_trials_database",
+  "skills/clinvar_database",
+  "skills/credentials",
+  "skills/dbsnp_database",
+  "skills/embl_ebi_ols",
+  "skills/encode_ccres_database",
+  "skills/ensembl_database",
+  "skills/foldseek_structural_search",
+  "skills/gnomad_database",
+  "skills/gtex_database",
+  "skills/human_protein_atlas_database",
+  "skills/interpro_database",
+  "skills/jaspar_database",
+  "skills/literature_search_arxiv",
+  "skills/literature_search_biorxiv",
+  "skills/literature_search_europepmc",
+  "skills/literature_search_openalex",
+  "skills/ncbi_sequence_fetch",
+  "skills/openfda_database",
+  "skills/opentargets_database",
+  "skills/pdb_database",
+  "skills/predictingthepast",
+  "skills/protein_sequence_msa",
+  "skills/protein_sequence_similarity_search",
+  "skills/pubchem_database",
+  "skills/pubmed_database",
+  "skills/pymol",
+  "skills/quickgo_database",
+  "skills/reactome_database",
+  "skills/string_database",
+  "skills/ucsc_conservation_and_tfbs",
+  "skills/unibind_database",
+  "skills/uniprot_database",
+  "skills/uv",
+  "skills/workflow_skill_creator"
+]
+
+preserve_rules = [
+  "Keep every registered science skill as a separate top-level folder under skills/ so Codex can discover each SKILL.md.",
+  "Preserve upstream folder names with underscores; do not rename folders to match hyphenated frontmatter names.",
+  "Treat this entry as one upstream collection for checking, updating, and reporting.",
+  "Do not automatically add newly introduced upstream skills; report them and ask before importing.",
+  "Do not delete registered local skills automatically when upstream removes or renames them; propose a migration plan first.",
+  "Preserve the collection LICENSE and SKILL_LICENSES.md at the registered support_paths.",
+  "Do not install uv, Python packages, external binaries, or API keys during an upstream sync.",
+  "Run git diff --check after preparing any candidate update."
+]
