@@ -133,6 +133,38 @@ preserve_rules = [
   "Run git diff --check after preparing any candidate update."
 ]
 
+[[skills]]
+name = "caveman"
+local_path = "skills/caveman"
+upstream_url = "https://github.com/JuliusBrussee/caveman"
+source_type = "github-subdir"
+upstream_subdir = "skills/caveman"
+tracking = "default-branch-or-release"
+current_source = "main at 0d95a81d35a9f2d123a5e9430d1cfc43d55f1bb0, downloaded 2026-07-28"
+
+preserve_rules = [
+  "Keep only the Codex skill subdirectory at skills/caveman.",
+  "Preserve the upstream README.md alongside SKILL.md.",
+  "Do not install hooks, commands, plugins, Node packages, or agent-specific files from the repository root.",
+  "Run git diff --check after preparing any candidate update."
+]
+
+[[skills]]
+name = "i-have-adhd"
+local_path = "skills/i-have-adhd"
+upstream_url = "https://github.com/ayghri/i-have-adhd"
+source_type = "github-subdir"
+upstream_subdir = "skills/i-have-adhd"
+tracking = "default-branch-or-release"
+current_source = "main at 07684c4ab625dd7d1ea6e99e065f60bc0ac6a1ba, downloaded 2026-07-28"
+
+preserve_rules = [
+  "Keep only the Codex skill subdirectory at skills/i-have-adhd.",
+  "Preserve the agents metadata directory alongside SKILL.md.",
+  "Do not import repository-level packaging or marketplace metadata.",
+  "Run git diff --check after preparing any candidate update."
+]
+
 [[collections]]
 name = "google-deepmind-science-skills"
 upstream_url = "https://github.com/google-deepmind/science-skills"
