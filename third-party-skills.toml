@@ -13,7 +13,7 @@ local_path = "skills/frontend-slides"
 upstream_url = "https://github.com/zarazhangrui/frontend-slides"
 source_type = "github"
 tracking = "default-branch-or-release"
-current_source = "local copy imported before 2026-07-09; exact upstream commit unknown"
+current_source = "main at 9906a34d640d2111f724544cbc50f7f130569ae1, latest release v2.1.0, downloaded 2026-08-03"
 
 preserve_rules = [
   "Keep only the top-level Codex skill at skills/frontend-slides.",
@@ -28,7 +28,7 @@ local_path = "skills/humanizer"
 upstream_url = "https://github.com/blader/humanizer"
 source_type = "github"
 tracking = "default-branch-or-release"
-current_source = "local copy imported before 2026-07-09; exact upstream commit unknown"
+current_source = "main/tag v2.9.1 at 523374dee72d67c7b2b5f858ea0094ffda49c3ac, downloaded 2026-08-03"
 
 preserve_rules = [
   "Keep only the top-level Codex skill at skills/humanizer.",
@@ -44,7 +44,7 @@ upstream_url = "https://github.com/hamelsmu/hamelnb"
 source_type = "github-subdir"
 upstream_subdir = "skills/jupyter-live-kernel"
 tracking = "default-branch-or-release"
-current_source = "local copy imported before 2026-07-09; exact upstream commit unknown"
+current_source = "main at 192f491fd388bbc190bcaa95542c5d5f98dae2ab, downloaded 2026-08-03"
 
 preserve_rules = [
   "Keep only the top-level Codex skill at skills/jupyter-live-kernel.",
@@ -74,7 +74,6 @@ local_paths = [
 ]
 
 upstream_skills_observed = [
-  "skills/_shared",
   "skills/nature-academic-search",
   "skills/nature-citation",
   "skills/nature-data",
@@ -82,6 +81,7 @@ upstream_skills_observed = [
   "skills/nature-experiment-log",
   "skills/nature-figure",
   "skills/nature-literature-pipeline",
+  "skills/nature-paper-card",
   "skills/nature-paper-to-patent",
   "skills/nature-paper2ppt",
   "skills/nature-polishing",
@@ -90,6 +90,7 @@ upstream_skills_observed = [
   "skills/nature-ref-verifier",
   "skills/nature-response",
   "skills/nature-reviewer",
+  "skills/nature-shared",
   "skills/nature-statistics",
   "skills/nature-writing"
 ]
@@ -109,7 +110,7 @@ local_path = "skills/a-stock-data"
 upstream_url = "https://github.com/simonlin1212/a-stock-data"
 source_type = "github"
 tracking = "default-branch-or-release"
-current_source = "main at bcda4054b979166a3d06b628f16f3dc9b1ff7eb2, downloaded 2026-07-09"
+current_source = "main at 715b9f47f098aef393713a03f1f37cb3c7eef93b, latest release v3.6.0, downloaded 2026-08-03"
 
 preserve_rules = [
   "Keep the repository-root skill at skills/a-stock-data.",
@@ -124,7 +125,7 @@ local_path = "skills/global-stock-data"
 upstream_url = "https://github.com/simonlin1212/global-stock-data"
 source_type = "github"
 tracking = "default-branch-or-release"
-current_source = "main at d52a8a0013363577bceb28ca876c88fe6c1a5aeb, downloaded 2026-07-09"
+current_source = "main/tag v2.0.3 at c0b3ed8d8a1fdff0932e5899fc64a5994308a5ef, downloaded 2026-08-03"
 
 preserve_rules = [
   "Keep the repository-root skill at skills/global-stock-data.",
@@ -140,7 +141,7 @@ upstream_url = "https://github.com/JuliusBrussee/caveman"
 source_type = "github-subdir"
 upstream_subdir = "skills/caveman"
 tracking = "default-branch-or-release"
-current_source = "main at 0d95a81d35a9f2d123a5e9430d1cfc43d55f1bb0, downloaded 2026-07-28"
+current_source = "main at 7066cc815414421f1ed29b42293cfb177a11db8c, latest release v1.10.0, downloaded 2026-08-03"
 
 preserve_rules = [
   "Keep only the Codex skill subdirectory at skills/caveman.",
@@ -156,7 +157,7 @@ upstream_url = "https://github.com/ayghri/i-have-adhd"
 source_type = "github-subdir"
 upstream_subdir = "skills/i-have-adhd"
 tracking = "default-branch-or-release"
-current_source = "main at 07684c4ab625dd7d1ea6e99e065f60bc0ac6a1ba, downloaded 2026-07-28"
+current_source = "main at d05af1e4ac2259846e81686d14180d46d84acc2d, checked 2026-08-03; registered subdir unchanged"
 
 preserve_rules = [
   "Keep only the Codex skill subdirectory at skills/i-have-adhd.",

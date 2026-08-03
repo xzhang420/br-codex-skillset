@@ -2,6 +2,16 @@
 
 A coding-agent skill for creating stunning HTML presentations — from scratch or by converting PowerPoint files. It is packaged as a Claude Code plugin, and the core `SKILL.md` can also be read by other coding agents with filesystem and shell access.
 
+## 📺 Watch the Walkthrough & Tutorial
+
+New here? This beginner-friendly video walks you through the whole thing, start to finish.
+
+<a href="https://www.youtube.com/watch?v=372Iksaz8b0" title="Frontend Slides — walkthrough & tutorial (beginner-friendly)">
+  <img src="https://img.youtube.com/vi/372Iksaz8b0/maxresdefault.jpg" alt="Watch the Frontend Slides walkthrough and tutorial on YouTube" width="100%" />
+</a>
+
+> ▶️ **[Watch on YouTube →](https://www.youtube.com/watch?v=372Iksaz8b0)** (beginner-friendly walkthrough and tutorial)
+
 ## What This Does
 
 **Frontend Slides** helps non-designers create beautiful web presentations without knowing CSS or JavaScript. It uses a "show, don't tell" approach: instead of asking you to describe your aesthetic preferences in words, it generates visual previews and lets you pick what you like.
@@ -512,7 +522,7 @@ This skill uses **progressive disclosure** — the main `SKILL.md` is a workflow
 | ------------------------- | ------------------------------ | ------------------------- |
 | `SKILL.md`                | Core workflow and rules        | Always (skill invocation) |
 | `STYLE_PRESETS.md`        | 12 curated visual presets      | Phase 2 (style selection) |
-| `bold-template-pack/selection-index.json` | Compact bold template metadata | Phase 2 (candidate selection) |
+| `bold-template-pack/selection-index.json` | Compact bold template metadata for candidate selection | Phase 2 (style selection) |
 | `bold-template-pack/templates/*/preview.md` | Tiny style cards for shortlisted bold previews | Phase 2 after shortlisting |
 | `bold-template-pack/templates/*/design.md` | Full design system for the selected bold template | Phase 3 after user selection |
 | `viewport-base.css`       | Mandatory fixed-stage CSS      | Phase 3 (generation)      |

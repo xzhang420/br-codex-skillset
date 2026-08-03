@@ -11,157 +11,187 @@ metadata:
     category: data-science
 ---
 
-# Jupyter Live Kernel (hamelnb)
+# hamelnb
 
-Gives you a **stateful Python REPL** via a live Jupyter kernel. Variables persist
-across executions. Use this instead of `execute_code` when you need to build up
-state incrementally, explore APIs, inspect DataFrames, or iterate on complex code.
+Use this skill when a local notebook kernel already holds useful state and you do not want to rerun expensive setup.
 
-## When to Use This vs Other Tools
+## Starting JupyterLab
 
-| Tool | Use When |
-|------|----------|
-| **This skill** | Iterative exploration, state across steps, data science, ML, "let me try this and check" |
-| `execute_code` | One-shot scripts needing hermes tool access (web_search, file ops). Stateless. |
-| `terminal` | Shell commands, builds, installs, git, process management |
+When launching JupyterLab for use with this skill, disable token and password auth so the script can access the server API without browser session cookies:
 
-**Rule of thumb:** If you'd want a Jupyter notebook for the task, use this skill.
-
-## Prerequisites
-
-1. **uv** must be installed (check: `which uv`)
-2. **JupyterLab** must be installed: `uv tool install jupyterlab`
-3. A Jupyter server must be running (see Setup below)
-
-## Setup
-
-The hamelnb script location:
-```
-SCRIPT="$HOME/.agent-skills/hamelnb/skills/jupyter-live-kernel/scripts/jupyter_live_kernel.py"
+```bash
+jupyter lab --IdentityProvider.token='' --ServerApp.password=''
 ```
 
-If not cloned yet:
-```
-git clone https://github.com/hamelsmu/hamelnb.git ~/.agent-skills/hamelnb
+If the server is already running but returns 403 errors, restart it with these flags.
+
+## Core Loop
+
+Run from the repo root.
+
+```bash
+SCRIPT=skills/jupyter-live-kernel/scripts/jupyter_live_kernel.py
 ```
 
-### Starting JupyterLab
+Prefer `uv` for this skill. The helper script declares its runtime dependencies inline, so the default invocation is:
 
-Check if a server is already running:
-```
-uv run "$SCRIPT" servers
-```
-
-If no servers found, start one:
-```
-jupyter-lab --no-browser --port=8888 --notebook-dir=$HOME/notebooks \
-  --IdentityProvider.token='' --ServerApp.password='' > /tmp/jupyter.log 2>&1 &
-sleep 3
+```bash
+uv run "$SCRIPT" --help
 ```
 
-Note: Token/password disabled for local agent access. The server runs headless.
+Because the script uses inline metadata, `uv run "$SCRIPT"` stays self-contained even when you launch it from inside this repo.
 
-### Creating a Notebook for REPL Use
+If the script is executable and `uv` is on `PATH`, direct execution also works:
 
-If you just need a REPL (no existing notebook), create a minimal notebook file:
-```
-mkdir -p ~/notebooks
-```
-Write a minimal .ipynb JSON file with one empty code cell, then start a kernel
-session via the Jupyter REST API:
-```
-curl -s -X POST http://127.0.0.1:8888/api/sessions \
-  -H "Content-Type: application/json" \
-  -d '{"path":"scratch.ipynb","type":"notebook","name":"scratch.ipynb","kernel":{"name":"python3"}}'
+```bash
+"$SCRIPT" --help
 ```
 
-## Core Workflow
+Fallback:
+- Use `python3 "$SCRIPT" ...` only if `uv` is unavailable and the required packages are already installed.
+- If you need to add a new runtime dependency to the helper script, prefer `uv add --script "$SCRIPT" <package>`.
 
-All commands return structured JSON. Always use `--compact` to save tokens.
-
-### 1. Discover servers and notebooks
-
-```
+1. Discover reachable servers.
+```bash
 uv run "$SCRIPT" servers --compact
-uv run "$SCRIPT" notebooks --compact
 ```
 
-### 2. Execute code (primary operation)
-
-```
-uv run "$SCRIPT" execute --path <notebook.ipynb> --code '<python code>' --compact
-```
-
-State persists across execute calls. Variables, imports, objects all survive.
-
-Multi-line code works with $'...' quoting:
-```
-uv run "$SCRIPT" execute --path scratch.ipynb --code $'import os\nfiles = os.listdir(".")\nprint(f"Found {len(files)} files")' --compact
+2. Find live notebooks.
+```bash
+uv run "$SCRIPT" notebooks --port 8899 --compact
 ```
 
-### 3. Inspect live variables
-
-```
-uv run "$SCRIPT" variables --path <notebook.ipynb> list --compact
-uv run "$SCRIPT" variables --path <notebook.ipynb> preview --name <varname> --compact
+3. Inspect the saved notebook.
+```bash
+uv run "$SCRIPT" contents --port 8899 --path demo.ipynb --compact
 ```
 
-### 4. Edit notebook cells
-
-```
-# View current cells
-uv run "$SCRIPT" contents --path <notebook.ipynb> --compact
-
-# Insert a new cell
-uv run "$SCRIPT" edit --path <notebook.ipynb> insert \
-  --at-index <N> --cell-type code --source '<code>' --compact
-
-# Replace cell source (use cell-id from contents output)
-uv run "$SCRIPT" edit --path <notebook.ipynb> replace-source \
-  --cell-id <id> --source '<new code>' --compact
-
-# Delete a cell
-uv run "$SCRIPT" edit --path <notebook.ipynb> delete --cell-id <id> --compact
+4. Execute code incrementally in the live kernel.
+```bash
+uv run "$SCRIPT" execute \
+  --port 8899 \
+  --path demo.ipynb \
+  --code $'x = 41\nprint("hello")\nx + 1' \
+  --compact
 ```
 
-### 5. Verification (restart + run all)
-
-Only use when the user asks for a clean verification or you need to confirm
-the notebook runs top-to-bottom:
-
+5. Edit saved notebook cells.
+Use a real cell ID returned by `contents`.
+```bash
+uv run "$SCRIPT" edit \
+  --port 8899 \
+  --path demo.ipynb \
+  replace-source \
+  --cell-id <cell-id> \
+  --source $'x = 42\nx' \
+  --compact
 ```
-uv run "$SCRIPT" restart-run-all --path <notebook.ipynb> --save-outputs --compact
+
+To **insert a new cell**, use `insert` with `--at-index`, `--before <int>`, or `--after <int>`.
+Note: `--before`/`--after` accept integer indices, **not** cell IDs.
+```bash
+uv run "$SCRIPT" edit \
+  --port 8899 \
+  --path demo.ipynb \
+  insert \
+  --at-index 1 \
+  --cell-type code \
+  --source $'print("hello")' \
+  --compact
 ```
 
-## Practical Tips from Experience
+The available `edit` subcommands are: `replace-source`, `insert`, `delete`, `move`, `clear-outputs`.
 
-1. **First execution after server start may timeout** — the kernel needs a moment
-   to initialize. If you get a timeout, just retry.
+Core guidance:
+- Prefer `--cell-id` over `--index` for existing cells (`replace-source`, `delete`, `move`).
+- For `insert`, use `--at-index` (integer) — cell IDs are not accepted by `--before`/`--after`.
+- Use `execute` for the normal loop.
+- Keep `restart`, `run-all`, and `restart-run-all` for explicit verification or reset requests, not routine iteration.
+- Use `--save-outputs` with `run-all` or `restart-run-all` to persist cell outputs into the notebook file so they appear in the JupyterLab UI.
+- When using `execute` with `--cell-id`, outputs are automatically saved to the notebook file (no need to pass `--save-outputs` separately). Without `--cell-id`, outputs are not saved.
+- To use the kernel as a pure REPL without persisting outputs, pass `--no-save-outputs`. This suppresses the automatic save even when `--cell-id` is provided. Only use this flag when the user explicitly says they don't need the notebook updated (e.g. "run this headlessly", "I don't care about the notebook output"). Default to saving outputs.
 
-2. **The kernel Python is JupyterLab's Python** — packages must be installed in
-   that environment. If you need additional packages, install them into the
-   JupyterLab tool environment first.
+## Target Selection And Ambiguity
 
-3. **--compact flag saves significant tokens** — always use it. JSON output can
-   be very verbose without it.
+Always make the live target explicit before edits or execution. Never guess when more than one live option exists.
 
-4. **For pure REPL use**, create a scratch.ipynb and don't bother with cell editing.
-   Just use `execute` repeatedly.
+Required behavior:
+1. Resolve server first.
+   - If multiple reachable servers are discovered, ask the user to choose one.
+   - After selection, pass `--port` (or `--server-url`) on all follow-up commands.
+2. Resolve notebook path second.
+   - If the user already specified `--path`, use it.
+   - Otherwise run `notebooks` for the selected server and collect candidates.
+   - If there is exactly one live notebook, state it explicitly and proceed.
+   - If there are multiple notebook candidates, ask the user to choose one.
+3. Resolve session/kernel when needed.
+   - If multiple live sessions exist for the chosen path, ask the user to choose a session.
+   - Then pass `--session-id` on execute/restart/run-all/variables commands to pin the exact kernel.
 
-5. **Argument order matters** — subcommand flags like `--path` go BEFORE the
-   sub-subcommand. E.g.: `variables --path nb.ipynb list` not `variables list --path nb.ipynb`.
+Claude Code ambiguity flow:
+- Use `AskUserQuestion` for each ambiguity point (server, notebook, session) as a picker.
+- Keep each picker to one short question with a short header (`Server`, `Notebook`, `Session`).
+- Option labels must include enough context to disambiguate:
+  - Server: `port`, `base URL`.
+  - Notebook: `path`, `port`.
+  - Session: `session id`, `kernel id`, `path`.
+- After selection, confirm in plain language (for example: `Using port 8888, notebook notebooks/tiny-demo.ipynb, session 1234...`), then continue.
 
-6. **If a session doesn't exist yet**, you need to start one via the REST API
-   (see Setup section). The tool can't execute without a live kernel session.
+Codex ambiguity flow:
+- Ask a direct clarifying question in plain text listing candidates.
+- Continue only after the user confirms a specific target.
 
-7. **Errors are returned as JSON** with traceback — read the `ename` and `evalue`
-   fields to understand what went wrong.
+Once selected, keep using the same `port + path` and, when applicable, `session_id` until the user asks to switch.
 
-8. **Occasional websocket timeouts** — some operations may timeout on first try,
-   especially after a kernel restart. Retry once before escalating.
+## Advanced
 
-## Timeout Defaults
+Inspect live Python-kernel variables:
 
-The script has a 30-second default timeout per execution. For long-running
-operations, pass `--timeout 120`. Use generous timeouts (60+) for initial
-setup or heavy computation.
+```bash
+uv run "$SCRIPT" variables --port 8899 --path demo.ipynb list --compact
+uv run "$SCRIPT" variables --port 8899 --path demo.ipynb preview --name x --compact
+```
+
+Verification commands:
+
+```bash
+uv run "$SCRIPT" restart --port 8899 --path demo.ipynb --compact
+uv run "$SCRIPT" run-all --port 8899 --path demo.ipynb --compact
+uv run "$SCRIPT" run-all --port 8899 --path demo.ipynb --save-outputs --compact
+uv run "$SCRIPT" restart-run-all --port 8899 --path demo.ipynb --save-outputs --compact
+```
+
+Advanced guidance:
+- `variables` is Python-only.
+- `run-all` and `restart-run-all` require a notebook-backed live session.
+- `run-all` and `restart-run-all` exit non-zero when a cell fails.
+- `run-all` and `restart-run-all` verify a saved snapshot loaded at the start.
+- Pass `--save-outputs` to `run-all` or `restart-run-all` to persist cell outputs and execution counts back into the notebook file. Without this flag outputs are not written back.
+
+## Transport
+
+`execute`, `variables`, `run-all`, and `restart-run-all` default to `--transport auto`.
+
+- `websocket`: use Jupyter Server kernel channels at `/api/kernels/<kernel_id>/channels`
+- `zmq`: fall back to the local kernel connection file with `jupyter_client`
+- `auto`: try websocket first, then use local ZMQ fallback only when the websocket request did not already reach the kernel
+
+Prefer `auto` unless you are debugging transport behavior.
+
+## Limits
+
+- `contents` returns the saved notebook file, not unsaved browser edits.
+- `edit` writes through the Contents API and changes the saved notebook on disk.
+- The stale-write guard is best-effort, not atomic.
+- Concurrent notebook edits can invalidate a verification run after it starts.
+- Concurrent execution from other clients can affect kernel state during verification.
+- Variable listing is bounded to `--limit <= 100`.
+- Variable preview is bounded to `--max-chars <= 2000` and avoids arbitrary `repr(...)` calls for non-scalar objects.
+- Workspace-derived notebook tabs are a persisted JupyterLab snapshot, not guaranteed real-time UI truth.
+- Workspace-derived notebook tabs can include historical workspaces for the same relative path.
+- The skill assumes local Jupyter runtime metadata is visible to the current user.
+
+## Resources
+
+- Script: [jupyter_live_kernel.py](scripts/jupyter_live_kernel.py)
+- Architecture notes: [jupyter-hooks.md](references/jupyter-hooks.md)

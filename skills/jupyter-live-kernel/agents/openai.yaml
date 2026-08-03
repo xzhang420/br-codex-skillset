@@ -1,0 +1,4 @@
+interface:
+  display_name: "hamelnb"
+  short_description: "Inspect live notebooks and run kernel code."
+  default_prompt: "Use hamelnb to inspect a local JupyterLab or Jupyter Server instance, list live notebook sessions, read saved notebook contents, and execute code incrementally in an existing kernel."
