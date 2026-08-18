@@ -1,0 +1,4 @@
+interface:
+  display_name: "Remove LumaCam Experiment"
+  short_description: "Audit and safely remove LumaCam experiment data"
+  default_prompt: "Use $godzilla-remove-lumacam-experiment to audit an NCI experiment and request confirmation before deleting it."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "LumaCam New Proposal"
+  short_description: "Prepare a calibrated LumaCam proposal safely"
+  default_prompt: "Use $godzilla-lumacam-new-proposal to prepare a new LumaCam proposal from the current template, calibration directory, and explicitly supplied monitored-acquisition email recipients."
