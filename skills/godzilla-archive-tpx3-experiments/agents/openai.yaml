@@ -1,0 +1,4 @@
+interface:
+  display_name: "Archive TPX3 Experiments"
+  short_description: "Safely archive verified TPX3 experiment folders"
+  default_prompt: "Use $godzilla-archive-tpx3-experiments to audit and safely compress selected tpx3Files experiment folders."
