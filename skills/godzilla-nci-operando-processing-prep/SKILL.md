@@ -1,5 +1,5 @@
 ---
-name: nci-operando-processing-prep
+name: godzilla-nci-operando-processing-prep
 description: Prepare NCI (neutron capture imaging) operando processing runs for a new experiment by updating operando_config.ini paths, validating experiment/reference/beamhistory/echem inputs, or reporting TPX time ranges before beam-history download. Use only when the user explicitly refers to NCI, neutron capture imaging, or this NCI-specific operando campaign structure.
 ---
 
@@ -17,7 +17,7 @@ Use this skill for repetitive setup work around NCI operando processing in `Leon
 ## Do not use this skill for
 
 - Neutron radiography data or conventional transmission radiography workflows
-- Running the notebook, debugging correction failures, plotting, or interpreting artifacts; use `nci-operando-processing-workflow` instead
+- Running the notebook, debugging correction failures, plotting, or interpreting artifacts; use `godzilla-nci-operando-processing-workflow` instead
 - Choosing `background_n_images`
 - Choosing `selected_image_indices`
 - Deciding whether a reference is scientifically appropriate
@@ -47,19 +47,19 @@ Use this skill for repetitive setup work around NCI operando processing in `Leon
 Dry-run showing current config plus TPX time ranges:
 
 ```bash
-python3 ~/.codex/skills/nci-operando-processing-prep/scripts/prepare_operando_run.py   --config /path/to/operando_config.ini   --print-config --show-ranges --dry-run
+python3 ~/.codex/skills/godzilla-nci-operando-processing-prep/scripts/prepare_operando_run.py   --config /path/to/operando_config.ini   --print-config --show-ranges --dry-run
 ```
 
 Update a config for a new experiment:
 
 ```bash
-python3 ~/.codex/skills/nci-operando-processing-prep/scripts/prepare_operando_run.py   --config /path/to/operando_config.ini   --exp-dir experiment/exp1301_LiMetal_final   --beamhistory-path beamhistory/Leon_BOA_Dec2025_exp1301_LiMetal_final.csv   --reference-dir reference/exp004_Ref1um_NewCell_40x20NA_wmetal   --reference-beamhistory-path beamhistory/Leon_BOA_Dec2025_Ref.csv
+python3 ~/.codex/skills/godzilla-nci-operando-processing-prep/scripts/prepare_operando_run.py   --config /path/to/operando_config.ini   --exp-dir experiment/exp1301_LiMetal_final   --beamhistory-path beamhistory/Leon_BOA_Dec2025_exp1301_LiMetal_final.csv   --reference-dir reference/exp004_Ref1um_NewCell_40x20NA_wmetal   --reference-beamhistory-path beamhistory/Leon_BOA_Dec2025_Ref.csv
 ```
 
 Show TPX time ranges only:
 
 ```bash
-python3 ~/.codex/skills/nci-operando-processing-prep/scripts/prepare_operando_run.py   --config /path/to/operando_config.ini   --show-ranges --dry-run
+python3 ~/.codex/skills/godzilla-nci-operando-processing-prep/scripts/prepare_operando_run.py   --config /path/to/operando_config.ini   --show-ranges --dry-run
 ```
 
 ## Notes

@@ -1,5 +1,5 @@
 ---
-name: nci-operando-processing-workflow
+name: godzilla-nci-operando-processing-workflow
 description: Run, debug, and extend downstream NCI (neutron capture imaging) operando processing workflows built around operando_pipeline.ipynb, operando_config.ini, reconstructed NCI TIFF folders, electrochemistry files, and the C:\Software\toolbox\operando Python modules. Use for NCI notebook execution, OBINT/reference/background correction, bad TIFF handling, and potential/thickness/event plots when the user explicitly refers to NCI or neutron capture imaging.
 ---
 
@@ -24,7 +24,7 @@ This skill applies only to NCI, meaning neutron capture imaging, and only after 
 
 ### Experiment Path Setup
 
-- For simple NCI experiment switching, beam-history matching, and path validation before running the notebook, use `nci-operando-processing-prep` first.
+- For simple NCI experiment switching, beam-history matching, and path validation before running the notebook, use `godzilla-nci-operando-processing-prep` first.
 - Read the GUI setup cell and `operando_config.ini`.
 - Update the config to point at the requested experiment first, rather than editing many notebook cells.
 - Check for related paths: raw image directory, OB/open-beam images, dark/background images, corrected output directory, electrochemistry file, and plot output directory.

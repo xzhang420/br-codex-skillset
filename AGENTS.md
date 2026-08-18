@@ -21,4 +21,4 @@ If there is a merge conflict, authentication failure, or uncertainty about overw
 
 Never stage or commit Codex auth files, sessions, logs, SQLite state files, caches, sandbox files, plugin caches, local backups, or `skills/.system/`.
 
-Third-party skills listed in `third-party-skills.toml` are maintained by the primary update device. That automation may update only registered third-party entries, validate the result, commit, and push. User-maintained skills such as `personal-*`, `shared-*`, `operando-*`, and `srim-*` require explicit user confirmation before commit or push. Other devices should pull this shared repo rather than updating third-party upstreams directly.
+Third-party skills listed in `third-party-skills.toml` are maintained by the primary update device. That automation may update only registered third-party entries, validate the result, commit, and push. User-maintained skills under `personal-*`, `workstation-*`, `godzilla-*`, and `shared-*` require explicit user confirmation before commit or push. Other devices should pull this shared repo rather than updating third-party upstreams directly.

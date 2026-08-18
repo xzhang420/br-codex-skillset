@@ -1,5 +1,5 @@
 ---
-name: srim-trim-batch
+name: workstation-srim-trim-batch
 description: Set up and run iterative SRIM/TRIM simulations from a Windows SRIM folder using PowerShell batch automation. Use when the user wants to run TRIM.exe repeatedly across target layer widths, create per-run output folders, preserve TRANSMIT.txt/TRIMOUT.txt outputs, calculate transmitted-ion percentages, reduce or swap TRIM.DAT ion-event files, or recover/continue a SRIM/TRIM batch workflow.
 ---
 
