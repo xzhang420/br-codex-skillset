@@ -162,7 +162,7 @@ def validate_shell_text(text: str, path: Path) -> None:
 
 
 def prepare_batch_focus_notebook_text(notebook_path: Path, proposal_dir: Path) -> str:
-	"""Point the batch-focus notebook at this proposal's version-2 TPX3 root."""
+	"""Point the batch-focus notebook at this proposal's TPX3 root."""
 	notebook_path = require_file(notebook_path, "Batch-focus notebook")
 	try:
 		payload = json.loads(notebook_path.read_text(encoding="utf-8"))
@@ -275,18 +275,17 @@ def prepare_file_updates(
 	return updates
 
 
-def validate_template(template: Path) -> dict[str, object]:
+def validate_template(template: Path) -> Path:
 	template = require_directory(template, "Proposal template")
-	marker = require_file(
-		template / "data/experiments/metadata/layout.json", "Template layout marker"
-	)
-	try:
-		payload = json.loads(marker.read_text(encoding="utf-8"))
-	except json.JSONDecodeError as error:
-		raise SetupError(f"Invalid template layout marker {marker}: {error}") from error
-	if payload.get("layout_name") != "lumacam-nci-proposal" or payload.get("layout_version") != 2:
-		raise SetupError(f"Unsupported template layout marker: {marker}")
-	return payload
+	data_root = require_directory(template / "data/experiments", "Template data root")
+	for name in ("tpx3Files", "final", "derived", "logs", "metadata", ".work"):
+		require_directory(data_root / name, f"Template {name} directory")
+	require_file(template / "documentation/experiment_log.md", "Experiment log")
+	require_file(template / "documentation/measurement_protocol.md", "Measurement protocol")
+	marker = data_root / "metadata/layout.json"
+	if marker.exists():
+		raise SetupError(f"The structural template must not contain layout.json: {marker}")
+	return data_root
 
 
 def validate_processing_parameters(repository: Path) -> Path:
@@ -370,7 +369,7 @@ def main(argv: list[str] | None = None) -> int:
 		repository = require_directory(args.repository, "LumaCam repository")
 		data_base = require_directory(args.data_base, "Proposal parent")
 		photon_root = require_directory(args.photon_test_root, "Photon-test root")
-		template = repository / "NCI_PROPOSAL_TEMPLATE"
+		template = repository / "lumacam_proposal_template"
 		validate_template(template)
 		require_directory(
 			template / "data/experiments/tpx3Files", "Template TPX3 data directory"
@@ -416,9 +415,6 @@ def main(argv: list[str] | None = None) -> int:
 		for path, text in updates.items():
 			atomic_write_text(path, text)
 
-		marker = require_file(
-			proposal_dir / "data/experiments/metadata/layout.json", "Copied proposal layout marker"
-		)
 		validate_template(proposal_dir)
 		contains_all(repository / "python/settings_installation.py", (str(pixel), str(dacs)))
 		contains_all(repository / "acquisitionSettings.sh", (str(proposal_dir),))
@@ -443,9 +439,6 @@ def main(argv: list[str] | None = None) -> int:
 				),
 			),
 		)
-		if not marker.is_file():
-			raise SetupError(f"Copied proposal marker is missing: {marker}")
-
 		print("Setup completed and post-write validation passed.")
 		for warning in detector_warnings():
 			print(f"WARNING: {warning}", file=sys.stderr)

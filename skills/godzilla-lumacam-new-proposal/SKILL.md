@@ -1,6 +1,6 @@
 ---
 name: godzilla-lumacam-new-proposal
-description: Prepare a new LumaCam/NCI proposal on the acquisition workstation from NCI_PROPOSAL_TEMPLATE. Use when the user starts a new proposal or beamtime campaign and needs to copy the proposal template to /data01, select a new Timepix3 camera calibration directory, configure monitored-acquisition email recipients, update lumacam_measurementcontrol acquisition settings, repoint the TPX3 batch-focus notebook and its proposal-local cache, update every /data01/data_acquisition tpxAcqPhotonTest.py calibration reference, validate paths and processing settings, or perform a safe detector-conflict preflight before the first acquisition.
+description: Prepare a new LumaCam proposal on the acquisition workstation from lumacam_proposal_template. Use when the user starts a new proposal or beamtime campaign and needs to copy the proposal template to /data01, select a new Timepix3 camera calibration directory, configure monitored-acquisition email recipients, update lumacam_measurementcontrol acquisition settings, repoint the TPX3 batch-focus notebook and its proposal-local cache, update every /data01/data_acquisition tpxAcqPhotonTest.py calibration reference, validate paths and processing settings, or perform a safe detector-conflict preflight before the first acquisition.
 ---
 
 # Prepare a LumaCam Proposal
@@ -26,7 +26,7 @@ campaign copies in this skill.
 Use `scripts/setup_lumacam_proposal.py`. Its workstation defaults are:
 
 - repository: `/home/localadmin/Programs/lumacam_measurementcontrol`;
-- template: `<repository>/NCI_PROPOSAL_TEMPLATE`;
+- template: `<repository>/lumacam_proposal_template`;
 - proposal parent: `/data01`;
 - photon tests: `/data01/data_acquisition`;
 - batch-focus notebook: `/home/localadmin/Programs/tpx3cam-analysis/TPX3_batch_focus.ipynb`.
@@ -50,9 +50,9 @@ Request filesystem escalation when `/data01` or the shared workstation files are
 
 The script must complete all of these together:
 
-1. Validate the safe proposal name, live version-2 template, calibration pair, processing-parameter JSON, acquisition settings, and photon-test files.
+1. Validate the safe proposal name, live structural template, calibration pair, processing-parameter JSON, acquisition settings, and photon-test files.
 2. Refuse to overwrite an existing `/data01/<proposal-name>` directory.
-3. Copy the live `NCI_PROPOSAL_TEMPLATE` to `/data01/<proposal-name>`.
+3. Copy the live `lumacam_proposal_template` to `/data01/<proposal-name>`.
 4. Set `LUMACAM_PROPOSAL_DIR` in `acquisitionSettings.sh`.
 5. Set `config_pixel_path` and `config_dacs_path` in `python/settings_installation.py`.
 6. Replace `DEFAULT_EMAIL_TO` in `monitor_dataAcq_sumImages.py` with exactly the requested deduplicated recipient list. This is a workstation-wide monitor default for subsequent acquisitions, not proposal metadata; it intentionally replaces the preceding campaign's list. Do not change the sender address unless the user separately requests it.
@@ -67,7 +67,7 @@ If a validation or write fails, report the failing path. Do not substitute an ol
 
 Independently confirm that:
 
-- `/data01/<proposal>/data/experiments/metadata/layout.json` exists and declares layout version 2;
+- `/data01/<proposal>/data/experiments/` contains the standard acquisition subdirectories and no `layout.json` is required;
 - all configured calibration files resolve inside the requested calibration directory;
 - `DEFAULT_EMAIL_TO` in `monitor_dataAcq_sumImages.py` contains exactly the requested deduplicated recipients;
 - both photon-test copies use the same calibration pair;
