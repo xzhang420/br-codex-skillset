@@ -1,0 +1,4 @@
+interface:
+  display_name: "Archive LumaCam Data to SciCat"
+  short_description: "Safely batch-ingest LumaCam proposals into PSI SciCat"
+  default_prompt: "Use $godzilla-scicat-batch-ingest to prepare, validate, ingest, archive, or monitor a LumaCam proposal in PSI SciCat."
