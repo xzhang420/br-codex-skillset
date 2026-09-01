@@ -3,7 +3,7 @@
 <h1 align="center">a-stock-data</h1>
 
 <p align="center">
-  <b>A 股全栈数据工具包 — 10 层架构 · 47 个端点 · 15 个数据源 · 零鉴权</b>
+  <b>A 股全栈数据工具包 — 11 层架构 · 54 个端点 · 19 个数据源 · 零鉴权</b>
 </p>
 
 <p align="center">
@@ -11,22 +11,22 @@
   <img src="https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white" alt="Python">
   <a href="https://github.com/simonlin1212/a-stock-data/stargazers"><img src="https://img.shields.io/github/stars/simonlin1212/a-stock-data?style=social" alt="Stars"></a>
   <br>
-  <img src="https://img.shields.io/badge/layers-10-2ea44f.svg" alt="Layers">
-  <img src="https://img.shields.io/badge/endpoints-47-2ea44f.svg" alt="Endpoints">
-  <img src="https://img.shields.io/badge/sources-15-2ea44f.svg" alt="Sources">
+  <img src="https://img.shields.io/badge/layers-11-2ea44f.svg" alt="Layers">
+  <img src="https://img.shields.io/badge/endpoints-54-2ea44f.svg" alt="Endpoints">
+  <img src="https://img.shields.io/badge/sources-19-2ea44f.svg" alt="Sources">
   <img src="https://img.shields.io/badge/auth-zero-success.svg" alt="Zero Auth">
 </p>
 
 <p align="center">
   <a href="#架构">架构</a> ·
   <a href="#快速开始">快速开始</a> ·
-  <a href="#47-个端点能力清单">端点清单</a> ·
+  <a href="#54-个端点能力清单">端点清单</a> ·
   <a href="#使用示例">使用示例</a> ·
   <a href="#faq">FAQ</a> ·
   <a href="./CHANGELOG.md">更新日志</a>
 </p>
 
-一个自包含的 Skill 文件，把分散在 15 个数据源里的 A 股原始数据整合成 AI 编程助手直接能用的工具集。你不用再背 mootdx 的 K 线参数、东财的 PDF Referer 头、iwencai 的 X-Claw 鉴权——全部封装好了。主源被封还有「备用源速查」可降级。
+一个自包含的 Skill 文件，把分散在 19 个数据源里的 A 股原始数据整合成 AI 编程助手直接能用的工具集。你不用再背 mootdx 的 K 线参数、东财的 PDF Referer 头、iwencai 的 X-Claw 鉴权——全部封装好了。主源被封还有「备用源速查」可降级。
 
 > 兼容 [Claude Code](https://github.com/anthropics/claude-code) · [Codex](https://github.com/openai/codex) · [OpenClaw](https://github.com/anthropics/openclaw)
 >
@@ -37,23 +37,27 @@
 ## 架构
 
 ```
-A 股全栈数据 · 十层架构 · V3.6.1
+A 股全栈数据 · 十一层架构 · V3.7.1
 │  （优先级：mootdx/腾讯 不封IP 优先用；东财仅用于独有数据，已内置限流防封）
-├── 行情层    mootdx + 腾讯财经 + 百度K线   K线(带MA5/10/20) + 五档盘口 + PE/PB/市值 + 指数/ETF
+├── 行情层    mootdx + 腾讯 + 百度K线 + 新浪  K线(带MA5/10/20) + 五档盘口 + PE/PB/市值 + 指数/ETF
+│                                           + 复权因子 qfq/hfq  ★V3.7
 ├── 研报层    东财 reportapi + 同花顺 + iwencai  个股研报 / 行业研报 / PDF下载 / 一致预期 / NL搜索
 ├── 信号层    同花顺 + 东财                  强势股 + 题材归因 + 北向资金 + 板块归属
 │                                           + 资金流向(push2) + 龙虎榜 + 全市场龙虎榜 + 解禁 + 行业对比 + 板块资金流
 ├── 资金面    东财 datacenter + push2        融资融券 + 大宗交易 + 股东户数 + 分红送转 + 资金流(分钟+120日)
+│   /筹码     本地计算                       筹码分布 CYQ：获利比例 / 平均成本 / 成本区间 / 筹码峰  ★V3.7
 ├── 新闻层    东财 + 财联社                  个股新闻 / 财联社电报(✅V3.4复活) / 全球资讯（互备）
 ├── 基础数据  mootdx + 东财 + 新浪           季报37字段 / F10九大类 / 财报三表
+│           + baostock + 申万                估值历史(PE/PB/PS+换手率+停牌+ST) / 上市退市日 / 申万行业变迁史  ★V3.7
 ├── 公告层    巨潮 cninfo + mootdx           沪深北全量公告
 ├── 打板层    东财 push2ex + 同花顺          涨停池 / 炸板 / 跌停 / 昨涨停 / 涨停原因题材 / 连板梯队
 │                                           + 重点监控池 + 日内异动池  ★V3.6
 ├── 期权层    新浪 hq.sinajs                ETF期权 T型报价 / 希腊字母 / 隐含波动率 IV  ★V3.3
-└── 舆情互动  巨潮互动易 + 同花顺 + 东财     互动易问答 / 同花顺热榜 / 东财人气榜 / 概念命中  ★V3.3
+├── 舆情互动  巨潮互动易 + 同花顺 + 东财     互动易问答 / 同花顺热榜 / 东财人气榜 / 概念命中  ★V3.3
+└── 宏观层    人民银行 + 国家统计局          社会融资规模增量(月度12列) / PMI(制造业·非制造业·综合·大中小型)  ★V3.7
 ```
 
-> ★V3.4 十层之外另附**备用源速查 & 降级策略**：沪深交易所官方 + 新浪 + HKEX——龙虎榜/资金流/公告官方备胎函数 + 各层降级速查表，主源被封时用（见 SKILL.md 对应章节）。
+> ★V3.4 十一层之外另附**备用源速查 & 降级策略**：沪深交易所官方 + 新浪 + HKEX——龙虎榜/资金流/公告官方备胎函数 + 各层降级速查表，主源被封时用（见 SKILL.md 对应章节）。
 
 ---
 
@@ -70,7 +74,7 @@ curl -o ~/.claude/skills/a-stock-data/SKILL.md \
   https://raw.githubusercontent.com/simonlin1212/a-stock-data/main/SKILL.md
 
 # 3. 安装依赖（V3.0 不再需要 akshare）
-pip install mootdx requests pandas stockstats
+pip install mootdx requests pandas stockstats numpy baostock xlrd openpyxl
 ```
 
 启动 Claude Code，说一句「帮我看看 688017 的估值」，自动激活。
@@ -79,9 +83,9 @@ pip install mootdx requests pandas stockstats
 
 ---
 
-## 47 个端点能力清单
+## 54 个端点能力清单
 
-> **计数口径：** 下方清单共 48 行，按端点计 47 个——「东财 行业研报」与「东财 reportapi」为**同一端点**（仅 `qType` 参数不同）、「同花顺北向（历史）」为本地自缓存（非独立端点），两行不计入；「东财日内异动池」一行含 `list` / `count` **两个端点**，多计 1 个。48 − 1 − 1 + 1 = 47。
+> **计数口径：** 下方清单共 55 行，按端点计 54 个——「东财 行业研报」与「东财 reportapi」为**同一端点**（仅 `qType` 参数不同）、「同花顺北向（历史）」为本地自缓存（非独立端点），两行不计入；「东财日内异动池」一行含 `list` / `count` **两个端点**，多计 1 个。55 − 1 − 1 + 1 = 54。
 
 ### 行情层（实时，不封 IP）
 
@@ -90,6 +94,7 @@ pip install mootdx requests pandas stockstats
 | mootdx 行情 | K线(多周期) + 五档盘口 + 逐笔成交 + 实时报价 46 字段 |
 | 腾讯财经 | PE(TTM) / PB / 总市值 / 流通市值 / 换手率 / 涨跌停价 / 指数 / ETF |
 | **百度K线** | 日K线 + MA5/MA10/MA20 均价直接返回（V3.0 新增） |
+| **新浪复权因子** | qfq / hfq 因子序列 + 套用到不复权 K 线（V3.7 新增） |
 
 ### 研报层
 
@@ -125,6 +130,7 @@ pip install mootdx requests pandas stockstats
 | **股东户数变化** | 季度股东数 + 环比变化 + 户均持股（筹码集中度） |
 | **分红送转历史** | 每股派息/送股/转增 + 进度状态 |
 | **个股资金流120日** | 主力/大单/中单/小单日级净流入 |
+| **筹码分布 CYQ** | 获利比例 / 平均成本 / 90-70 成本区间与集中度 / 筹码峰（本地计算，V3.7 新增） |
 
 ### 新闻层
 
@@ -143,6 +149,9 @@ pip install mootdx requests pandas stockstats
 | 东财个股信息 | 行业/总股本/流通股/市值/上市日期（直连 push2） |
 | 新浪财报三表 | 资产负债表/利润表/现金流量表（直连 quotes.sina.cn） |
 | 巨潮公告 | 沪深北交所全量公告 |
+| **估值历史** | 日频 PE/PB/PS/PCF + 换手率 + 停牌 + ST（可回溯至 2016；**不支持北交所**，V3.7 新增） |
+| **上市/退市日** | ipoDate / outDate / 状态（唯一零鉴权退市日源，V3.7 新增） |
+| **申万行业变迁史** | 每只股票历次行业调整（消除前视偏差；仅代码无中文名，V3.7 新增） |
 
 ### 打板层（V3.3 新增）
 
@@ -173,6 +182,13 @@ pip install mootdx requests pandas stockstats
 | 东财人气榜 | 排名 + 排名变化 + 名称价格 |
 | 东财个股概念命中 | 这只票当下被市场归到哪些概念在炒 + 热度值 |
 
+### 宏观层（V3.7 新增）
+
+| 端点 | 数据 |
+|------|------|
+| **人民银行社融** | 社会融资规模增量月度 12 列（人民币贷款/委托/信托/未贴现汇票/企业债/政府债/股票融资/ABS/核销） |
+| **国家统计局 PMI** | 制造业 / 非制造业商务活动 / 综合产出 + 大中小型企业分档 |
+
 ### 备用源（V3.4 新增 · 主源被封时降级）
 
 | 端点 | 数据 |
@@ -181,11 +197,11 @@ pip install mootdx requests pandas stockstats
 | 资金流备胎 | 新浪日度四档单净额（超大/大/中/小单 + 净流入） |
 | 公告备胎 | 深市走深交所官方、沪市走东财，均带 PDF 直链（巨潮被封时用） |
 
-> 另附**十层主源 → 独立备胎速查表**（交易所官方 / 同花顺 F10 / HKEX / 巨潮 webapi / 金十等，全部不同风控面）与「已死透别用」名单，见 SKILL.md「备用源速查 & 降级策略」章节。
+> 另附**十一层主源 → 独立备胎速查表**（交易所官方 / 同花顺 F10 / HKEX / 巨潮 webapi / 金十等，全部不同风控面）与「已死透别用」名单，见 SKILL.md「备用源速查 & 降级策略」章节。
 
 ### 鉴权要求
 
-除 iwencai 外，其余所有数据源**完全免费无 Key**。仅 iwencai 语义搜索需要 API Key（[申请地址](https://www.iwencai.com/skillhub)）。
+除 iwencai 外，其余所有数据源**完全免费无 Key**（含 V3.7 新增的 baostock / 申万 / 人民银行 / 国家统计局，均零注册）。仅 iwencai 语义搜索需要 API Key（[申请地址](https://www.iwencai.com/skillhub)）。
 
 ---
 
@@ -222,6 +238,11 @@ pip install mootdx requests pandas stockstats
 | 新闻公告 | 「拉一下 300476 最近的新闻和公告」 |
 | **市场快讯** | 「用财联社电报看看现在市场上有什么大新闻」 |
 | 批量对比 | 「帮我对比这 5 只半导体股的估值」 |
+| **筹码分布** | 「600519 现在获利盘多少，平均成本在哪，筹码峰压力位在哪」 |
+| **估值历史** | 「茅台现在的 PE 在过去十年是什么分位，顺便看下换手率」 |
+| **ST / 停牌** | 「000004 历史上哪段时间是 ST，有没有停过牌」 |
+| **行业变迁** | 「000001 在 2016 年属于哪个申万行业，跟现在一样吗」 |
+| **宏观环境** | 「最新社融和 PMI 什么水平，现在流动性是宽还是紧」 |
 
 ### 内置 4 套调研流程
 
@@ -234,6 +255,24 @@ pip install mootdx requests pandas stockstats
 
 ---
 
+
+## V3.7 亮点
+
+**新增 1 个数据层、7 个端点、4 个数据源**（baostock / 申万 / 人民银行 / 国家统计局，全部零注册零 key），全部端点 2026-08-19 逐个实跑验证。
+
+| 补的是什么窟窿 | 端点 | 实测 |
+|---|---|---|
+| **「筹码层」名实不符** —— 原 §4.1~4.5 全是资金面数据，没有真正的筹码分布 | 筹码分布 CYQ | 东财**没有**公开 CYQ 接口（`push2`/`push2his` 实测均 404），改为 OHLC + 换手率本地推演，零新增数据源 |
+| **估值只有当日快照** | 估值历史 | 茅台 2016-01-04 起 **2581 行**日频 PE/PB/PS/PCF，另带换手率 / 停牌 / ST（000004 实测 276 天 isST=1） |
+| **K 线不复权，跨除权日必错** | 复权因子 qfq/hfq | 一次 HTTP 约 1.8KB；⚠️ **qfq 是除数、hfq 是乘数**，方向反了不报错只出错数 |
+| **拿不到退市日期** | 上市/退市日 | 唯一零鉴权源，可在筛选阶段剔除僵尸标的 |
+| **行业只有当前归属 → 前视偏差** | 申万行业变迁史 | **12,893 行 / 5,905 只 / 38 个一级行业**；实测平安银行 1991→2014→2021 三次变更 |
+| **完全没有宏观层** | 社融 + PMI | 社融月度 12 列（2026-01 增量 72,185 亿）；PMI 实测 2026-07 制造业 49.2 |
+
+> ⚠️ **新增依赖：** `numpy baostock xlrd openpyxl`。baostock 是 TCP 客户端库（免注册免 key），
+> **不支持北交所** —— 4/8/92/920 号段会被服务端拒绝，本工具包在登录前就拦截并抛 `ValueError`。
+
+---
 
 ## 数据源优先级（V3.2 重排，按封 IP 风险）
 
@@ -249,9 +288,13 @@ pip install mootdx requests pandas stockstats
 | 6 | 巨潮 cninfo | HTTP | 低 | 公告全文 |
 | 7 | 同花顺一致预期 | HTTP | 低（需 UA） | EPS 一致预期 |
 | 8 | iwencai | OpenAPI | 低（需 Key） | NL 语义搜索 |
+| 9 | **baostock** | TCP | 低（免注册） | 估值历史 PE/PB/PS/PCF + 换手率 + 停牌 + ST + 上市退市日（**不支持北交所**） |
+| 10 | **申万研究** | HTTP | 低（公开 XLS） | 行业分类变迁史 |
+| 11 | **人民银行** | HTTP | 低（官方站） | 社会融资规模增量 |
+| 12 | **国家统计局** | HTTP | 低（官方站） | PMI |
 | **末位（仅独有数据）** | **东财** datacenter/push2/reportapi/search/np-weblist | HTTP | **中 — 有风控会封 IP** | 龙虎榜/解禁/两融/大宗/股东户数/分红/资金流/研报/个股新闻/全球资讯（已统一走 `em_get()` 限流） |
 
-> **架构原则：** 除 mootdx（TCP 二进制协议）外，全部直连 HTTP API，零第三方数据封装依赖。**东财系接口有访问频率风控，所有调用统一经 `em_get()` 串行限流防封；批量任务请调大 `EM_MIN_INTERVAL`。**
+> **架构原则：** 除 mootdx 与 baostock（均为 TCP 客户端库）外，全部直连 HTTP API，不经第三方数据封装。**东财系接口有访问频率风控，所有调用统一经 `em_get()` 串行限流防封；批量任务请调大 `EM_MIN_INTERVAL`。**
 >
 > **降级原则（V3.4 新增）：** 任一主源被封/失效时，查 SKILL.md「备用源速查 & 降级策略」——每类数据都备有一条**不同域名、不同风控面**的独立备胎（沪深交易所官方 / 新浪 / 同花顺 / HKEX），东财被封时它们不受牵连。
 
@@ -266,7 +309,7 @@ pip install mootdx requests pandas stockstats
 V3.6.0 前研报层确实如此（reportapi 只认纯 6 位数字，带前缀静默返回 0 篇）。现已新增 `norm_ticker()` 并在研报层接入，四种写法结果一致；解析不出 6 位数字时**抛 ValueError 而非返回空**，避免把"代码写错"误读成"这票没数据"。
 
 **Q: SKILL.md 这么大，agent 每次加载很费 token？**
-单文件自包含是本项目的**有意产品决策**——拷一个文件就能用、离线可携、便于分发，这个形态会长期保持，不做目录化拆分（相关讨论见 #21 / #22 / #29）。两个降耗建议：① v3.3.1 起 description 已收窄触发范围，无需取数的 A 股话题不会再误加载整个文件；② token 敏感的用户可以不把它装成自动触发 skill，改为放进项目目录、需要取数时让 agent 按需读取——文件按十层组织、章节标题清晰，v3.4.0 起顶部还有「端点路由速查」总表（§→函数→用途→源），agent 按表定位后只读对应层，通常只花几 K token。
+单文件自包含是本项目的**有意产品决策**——拷一个文件就能用、离线可携、便于分发，这个形态会长期保持，不做目录化拆分（相关讨论见 #21 / #22 / #29）。两个降耗建议：① v3.3.1 起 description 已收窄触发范围，无需取数的 A 股话题不会再误加载整个文件；② token 敏感的用户可以不把它装成自动触发 skill，改为放进项目目录、需要取数时让 agent 按需读取——文件按十一层组织、章节标题清晰，v3.4.0 起顶部还有「端点路由速查」总表（§→函数→用途→源），agent 按表定位后只读对应层，通常只花几 K token。
 
 **Q: 东财接口 403 / 连接重置，是被封了怎么办？**
 东财系接口（datacenter/push2/push2ex/reportapi/search/np-weblist）共用同一套风控，IP 被封会成片失联。三步：① 停止请求等 30-60 分钟（IP 级临时封通常自动解除），或换网络（手机热点）立刻恢复；② 长批任务确认全部走 `em_get()` 并调大 `EM_MIN_INTERVAL`；③ 数据不能等 → 用 SKILL.md「备用源速查 & 降级策略」的独立备胎（交易所官方/新浪/同花顺，不同风控面）。

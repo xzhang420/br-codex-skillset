@@ -3,7 +3,7 @@
 <h1 align="center">a-stock-data</h1>
 
 <p align="center">
-  <b>Full-stack data toolkit for China A-shares — 10 layers · 47 endpoints · 15 sources · zero-auth</b>
+  <b>Full-stack data toolkit for China A-shares — 11 layers · 54 endpoints · 19 sources · zero-auth</b>
 </p>
 
 <p align="center">
@@ -11,22 +11,22 @@
   <img src="https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white" alt="Python">
   <a href="https://github.com/simonlin1212/a-stock-data/stargazers"><img src="https://img.shields.io/github/stars/simonlin1212/a-stock-data?style=social" alt="Stars"></a>
   <br>
-  <img src="https://img.shields.io/badge/layers-10-2ea44f.svg" alt="Layers">
-  <img src="https://img.shields.io/badge/endpoints-47-2ea44f.svg" alt="Endpoints">
-  <img src="https://img.shields.io/badge/sources-15-2ea44f.svg" alt="Sources">
+  <img src="https://img.shields.io/badge/layers-11-2ea44f.svg" alt="Layers">
+  <img src="https://img.shields.io/badge/endpoints-54-2ea44f.svg" alt="Endpoints">
+  <img src="https://img.shields.io/badge/sources-19-2ea44f.svg" alt="Sources">
   <img src="https://img.shields.io/badge/auth-zero-success.svg" alt="Zero Auth">
 </p>
 
 <p align="center">
   <a href="#architecture">Architecture</a> ·
   <a href="#quick-start">Quick Start</a> ·
-  <a href="#47-endpoints">Endpoints</a> ·
+  <a href="#54-endpoints">Endpoints</a> ·
   <a href="./CHANGELOG.md">Changelog</a>
 </p>
 
-Full-stack data toolkit for China A-Share market — 10-layer architecture · 47 endpoints (44 primary + 3 official backups) · 15 data sources · zero third-party data wrapper dependencies
+Full-stack data toolkit for China A-Share market — 11-layer architecture · 54 endpoints (51 primary + 3 official backups) · 19 data sources · direct HTTP calls except two TCP client libraries (mootdx / baostock)
 
-A self-contained Skill file that consolidates raw A-share data from 15 sources into a ready-to-use toolkit for AI coding assistants. No need to memorize mootdx candlestick parameters, Eastmoney PDF Referer headers, or iwencai X-Claw authentication — it's all handled. And when a primary source bans you, there's a backup-source quick reference to fall back on.
+A self-contained Skill file that consolidates raw A-share data from 19 sources into a ready-to-use toolkit for AI coding assistants. No need to memorize mootdx candlestick parameters, Eastmoney PDF Referer headers, or iwencai X-Claw authentication — it's all handled. And when a primary source bans you, there's a backup-source quick reference to fall back on.
 
 > Compatible with [Claude Code](https://github.com/anthropics/claude-code) · [Codex](https://github.com/openai/codex) · [OpenClaw](https://github.com/anthropics/openclaw)
 >
@@ -37,23 +37,27 @@ A self-contained Skill file that consolidates raw A-share data from 15 sources i
 ## Architecture
 
 ```
-China A-Share Full-Stack Data · 10-Layer Architecture · V3.6.1
+China A-Share Full-Stack Data · 11-Layer Architecture · V3.7.1
 │  (Priority: prefer mootdx/Tencent — never IP-banned; Eastmoney only for exclusive data, with built-in throttling)
-├── Market Data    mootdx + Tencent + Baidu K-line   Candlesticks (w/ MA5/10/20) + Order Book + PE/PB + Index/ETF
+├── Market Data    mootdx + Tencent + Baidu + Sina    Candlesticks (w/ MA5/10/20) + Order Book + PE/PB + Index/ETF
+│                                                     + adjust factors qfq/hfq  ★V3.7
 ├── Research       Eastmoney + THS + iwencai          Stock reports / Industry reports / PDF / Consensus EPS / NL search
 ├── Signals        THS + Eastmoney                    Hot stocks + Sector attribution + Northbound flow
 │                                                     + Sector membership + Fund flow(push2) + Dragon Tiger + Lockup + Industry + Board fund flow
 ├── Capital Flow   Eastmoney datacenter + push2       Margin trading + Block trades + Holder count + Dividends + Fund flow(min+120d)
+│   / Chips     computed locally                  Chip distribution (CYQ): profit ratio / avg cost / cost range / peak  ★V3.7
 ├── News           Eastmoney + Cailianpress           Stock news / CLS flash (✅revived in V3.4) / Global finance (mutual backup)
 ├── Fundamentals   mootdx + Eastmoney + Sina          37-field quarterly + F10 9 categories + Financial statements
+│               + baostock + SW                  Valuation history (PE/PB/PS + turnover + ST) / listing & delisting / SW industry history  ★V3.7
 ├── Filings        cninfo + mootdx                    Full filings across SSE / SZSE / BSE
 ├── Limit-Up       Eastmoney push2ex + THS            ZT/ZB/DT/prev-ZT pools / limit reasons / consecutive-board ladder
 │                                                     + Watch list pool + Intraday price-anomaly pool  ★V3.6
 ├── Options        Sina hq.sinajs                     ETF option T-quotes / Greeks / implied volatility  ★V3.3
-└── Sentiment      cninfo IRM + THS + Eastmoney       Investor Q&A / hot lists / popularity rank / concept hits  ★V3.3
+├── Sentiment      cninfo IRM + THS + Eastmoney       Investor Q&A / hot lists / popularity rank / concept hits  ★V3.3
+└── Macro          PBoC + NBS                     Social financing (monthly, 12 cols) / PMI (mfg · non-mfg · composite · by size)  ★V3.7
 ```
 
-> ★V3.4 On top of the 10 layers there is now a **Backup Sources & Fallback Strategy** appendix: SSE/SZSE official + Sina + HKEX — official backup functions (dragon-tiger / fund flow / filings) + a per-layer fallback table for when a primary source bans you (see the corresponding SKILL.md section).
+> ★V3.4 On top of the 11 layers there is now a **Backup Sources & Fallback Strategy** appendix: SSE/SZSE official + Sina + HKEX — official backup functions (dragon-tiger / fund flow / filings) + a per-layer fallback table for when a primary source bans you (see the corresponding SKILL.md section).
 
 ---
 
@@ -70,7 +74,7 @@ curl -o ~/.claude/skills/a-stock-data/SKILL.md \
   https://raw.githubusercontent.com/simonlin1212/a-stock-data/main/SKILL.md
 
 # 3. Install dependencies (V3.0: akshare no longer needed)
-pip install mootdx requests pandas stockstats
+pip install mootdx requests pandas stockstats numpy baostock xlrd openpyxl
 ```
 
 Launch Claude Code and say "Check the valuation of 688017" — the skill activates automatically.
@@ -79,9 +83,9 @@ Launch Claude Code and say "Check the valuation of 688017" — the skill activat
 
 ---
 
-## 47 Endpoints
+## 54 Endpoints
 
-> **Counting convention:** the tables below have 48 rows but count as 47 endpoints — "Eastmoney Industry Reports" shares **the same endpoint** as "Eastmoney reportapi" (only the `qType` parameter differs) and "THS Northbound (historical)" is a local self-built cache (not a separate endpoint), so neither is counted; the single "EM Intraday Anomaly Pool" row covers **two** endpoints (`list` / `count`), adding one back. 48 − 1 − 1 + 1 = 47.
+> **Counting convention:** the tables below have 55 rows but count as 54 endpoints — "Eastmoney Industry Reports" shares **the same endpoint** as "Eastmoney reportapi" (only the `qType` parameter differs) and "THS Northbound (historical)" is a local self-built cache (not a separate endpoint), so neither is counted; the single "EM Intraday Anomaly Pool" row covers **two** endpoints (`list` / `count`), adding one back. 55 − 1 − 1 + 1 = 54.
 
 ### Market Data (real-time, no IP ban)
 
@@ -90,6 +94,7 @@ Launch Claude Code and say "Check the valuation of 688017" — the skill activat
 | mootdx Market Data | Candlesticks (multi-period) + Level-2 order book + tick-by-tick + 46-field quote |
 | Tencent Finance | PE(TTM) / PB / Market Cap / Float Cap / Turnover / Price Limits / Index / ETF |
 | **Baidu K-line** | Daily K-line + MA5/MA10/MA20 moving averages included (V3.0 new) |
+| **Sina Adjust Factors** | qfq / hfq factor series + applying them to unadjusted candles (V3.7 new) |
 
 ### Research Reports
 
@@ -125,6 +130,7 @@ Launch Claude Code and say "Check the valuation of 688017" — the skill activat
 | **Shareholder Count** | Quarterly holder count + QoQ change + avg shares per holder |
 | **Dividend History** | Per-share cash dividend / bonus shares / transfer shares |
 | **120-Day Fund Flow** | Main / large / medium / small order daily net inflow |
+| **Chip Distribution (CYQ)** | Profit ratio / average cost / 90-70 cost range & concentration / chip peak (computed locally, V3.7 new) |
 
 ### News
 
@@ -143,6 +149,9 @@ Launch Claude Code and say "Check the valuation of 688017" — the skill activat
 | Eastmoney Stock Info | Industry / total shares / float / market cap / listing date (direct push2) |
 | Sina Financial Statements | Balance sheet / Income statement / Cash flow (direct quotes.sina.cn) |
 | cninfo Filings | Full filings across all exchanges |
+| **Valuation History** | Daily PE/PB/PS/PCF + turnover + suspension + ST flag (back to 2016; **Beijing Exchange not supported**, V3.7 new) |
+| **Listing / Delisting Date** | ipoDate / outDate / status (only zero-auth source for delisting dates, V3.7 new) |
+| **SW Industry History** | Every industry reclassification per stock (removes look-ahead bias; codes only, no Chinese names, V3.7 new) |
 
 ### Limit-Up / Limit-Down (V3.3 new)
 
@@ -173,6 +182,13 @@ Launch Claude Code and say "Check the valuation of 688017" — the skill activat
 | EM Popularity Rank | Rank + rank change + name/price |
 | EM Stock Concept Hits | Which concepts the market is grouping this stock under + heat |
 
+### Macro (V3.7 new)
+
+| Endpoint | Data |
+|----------|------|
+| **PBoC Social Financing** | Aggregate Financing to the Real Economy, monthly, 12 columns (RMB/entrusted/trust loans, undiscounted acceptances, corporate & government bonds, equity financing, ABS, write-offs) |
+| **NBS PMI** | Manufacturing / non-manufacturing / composite PMI + large / medium / small enterprise breakdown |
+
 ### Backup Sources (V3.4 new · fallback when a primary source bans you)
 
 | Endpoint | Data |
@@ -185,7 +201,7 @@ Launch Claude Code and say "Check the valuation of 688017" — the skill activat
 
 ### Authentication
 
-All data sources except iwencai are **completely free, no API key needed**. Only iwencai semantic search requires an API key ([apply here](https://www.iwencai.com/skillhub)).
+All data sources except iwencai are **completely free, no API key needed** (including the V3.7 additions — baostock / SW Research / PBoC / NBS — all zero-registration). Only iwencai semantic search requires an API key ([apply here](https://www.iwencai.com/skillhub)).
 
 ---
 
@@ -221,6 +237,11 @@ Just tell your AI assistant:
 | News & Filings | "Pull recent news and filings for 300476" |
 | Market Flash | "Any big market news right now on the CLS flash feed" |
 | Batch Compare | "Compare valuations of these 5 semiconductor stocks" |
+| **Chip Distribution** | "How much of 600519 is in profit, where's the average cost and the chip peak" |
+| **Valuation History** | "What percentile is Moutai's PE over the past decade, and show turnover too" |
+| **ST / Suspension** | "When was 000004 flagged ST, and has it ever been suspended" |
+| **Industry Drift** | "Which SW industry was 000001 in back in 2016 — same as today?" |
+| **Macro Backdrop** | "What's the latest social financing and PMI — is liquidity loose or tight" |
 
 ### 4 Built-in Research Workflows
 
@@ -233,6 +254,25 @@ Just tell your AI assistant:
 
 ---
 
+
+## V3.7 Highlights
+
+**1 new data layer, 7 new endpoints, 4 new sources** (baostock / SW Research / PBoC / NBS — all zero-registration, zero-key). Every endpoint was run and verified on 2026-08-19.
+
+| Gap it closes | Endpoint | Verified |
+|---|---|---|
+| **"Chip layer" was a misnomer** — §4.1~4.5 were all capital-flow data, no actual chip distribution | Chip Distribution (CYQ) | Eastmoney has **no** public CYQ endpoint (`push2`/`push2his` both 404 in testing); computed locally from OHLC + turnover, zero new sources |
+| **Valuation was same-day snapshot only** | Valuation History | **2,581 rows** of daily PE/PB/PS/PCF for Moutai since 2016-01-04, plus turnover / suspension / ST (000004 shows 276 ST days) |
+| **K-line is unadjusted — cross-ex-div comparisons break** | Adjust Factors qfq/hfq | One HTTP call, ~1.8KB; ⚠️ **qfq divides, hfq multiplies** — wrong direction fails silently with wrong numbers |
+| **No way to get delisting dates** | Listing / Delisting | Only zero-auth source; lets you drop zombie tickers at the screening stage |
+| **Industry was current-only → look-ahead bias** | SW Industry History | **12,893 rows / 5,905 tickers / 38 level-1 industries**; Ping An Bank verified across 1991→2014→2021 |
+| **No macro layer at all** | Social Financing + PMI | Social financing monthly, 12 columns (2026-01 flow: 7,218.5bn CNY); PMI 2026-07 manufacturing 49.2 |
+
+> ⚠️ **New dependencies:** `numpy baostock xlrd openpyxl`. baostock is a TCP client library (no registration, no key)
+> and **does not support the Beijing Exchange** — codes starting 4/8/92/920 are rejected server-side, so this
+> toolkit blocks them before login and raises `ValueError`.
+
+---
 
 ## Data Source Priority (V3.2 re-ranked by IP-ban risk)
 
@@ -248,9 +288,13 @@ Just tell your AI assistant:
 | 6 | cninfo | HTTP | Low | Filings |
 | 7 | THS Consensus EPS | HTTP | Low (UA required) | Consensus EPS |
 | 8 | iwencai | OpenAPI | Low (key required) | NL semantic search |
+| 9 | **baostock** | TCP | Low (no registration) | Valuation history PE/PB/PS/PCF + turnover + suspension + ST + listing/delisting dates (**no Beijing Exchange**) |
+| 10 | **SW Research** | HTTP | Low (public XLS) | Industry classification history |
+| 11 | **PBoC** | HTTP | Low (official site) | Aggregate social financing |
+| 12 | **NBS** | HTTP | Low (official site) | PMI |
 | **last (exclusive only)** | **Eastmoney** datacenter/push2/reportapi/search/np-weblist | HTTP | **Medium — has rate-limit risk** | Dragon-tiger / lockup / margin / block trade / shareholders / dividends / fund flow / reports / news (all via `em_get()`) |
 
-> **Architecture:** Except mootdx (TCP binary protocol), all sources use direct HTTP API calls, zero third-party data wrapper dependencies. **Eastmoney APIs are rate-limited; all calls go through `em_get()` for serial throttling. For batch jobs, increase `EM_MIN_INTERVAL`.**
+> **Architecture:** Except mootdx and baostock (both TCP client libraries), all sources use direct HTTP API calls with no third-party data wrapper in between. **Eastmoney APIs are rate-limited; all calls go through `em_get()` for serial throttling. For batch jobs, increase `EM_MIN_INTERVAL`.**
 >
 > **Fallback (V3.4 new):** When any primary source is banned or broken, check the "Backup Sources & Fallback Strategy" section in SKILL.md — every data category has an independent backup on a **different domain and rate-limit plane** (SSE/SZSE official / Sina / THS / HKEX), unaffected when Eastmoney bans you.
 

@@ -9,7 +9,7 @@ license: MIT
 author: Siqi Chen (@blader, https://github.com/blader/humanizer), ported by Hermes Agent
 platforms: [linux, macos, windows]
 metadata:
-  version: "2.11.0"
+  version: "2.11.1"
   hermes:
     tags: [writing, editing, humanize, anti-ai-slop, voice, prose, text]
     category: creative
@@ -187,13 +187,13 @@ Do not ban the repeated word. Fix the repeated sentence pattern. The remaining s
 
 ### 14. Em and en dashes
 
-**Rule:** The final rewrite must not contain em dashes (â€? or en dashes (â€?, unless the writer's sample uses them. Replace a dash with a period, comma, colon, or parentheses, or rewrite the sentence. Also check for spaced dashes (` â€?`) and double hyphens (` -- `) used as dashes.
+**Rule:** The final rewrite must not contain em dashes (â€”) or en dashes (â€“), unless the writer's sample uses them. Replace a dash with a period, comma, colon, or parentheses, or rewrite the sentence. Also check for spaced dashes (` â€” `) and double hyphens (` -- `) used as dashes.
 **Before:**
 > The term is primarily promoted by Dutch institutionsâ€”not by the people themselves. You don't say "Netherlands, Europe" as an addressâ€”yet this mislabeling continuesâ€”even in official documents.
 **After:**
 > The term is primarily promoted by Dutch institutions, not by the people themselves. You don't say "Netherlands, Europe" as an address, yet this mislabeling continues in official documents.
 **Before:**
-> The new policy â€?announced without warning â€?affects thousands of workers. The changes -- long overdue according to critics -- will take effect immediately.
+> The new policy â€” announced without warning â€” affects thousands of workers. The changes -- long overdue according to critics -- will take effect immediately.
 **After:**
 > The new policy, announced without warning, affects thousands of workers. The changes, long overdue according to critics, will take effect immediately.
 
@@ -227,14 +227,14 @@ Before returning the rewrite, search for `â€”` and `â€“`. Remove each one unless
 **Before:**
 > ðŸš€ **Launch Phase:** The product launches in Q3
 > ðŸ’¡ **Key Insight:** Users prefer simplicity
-> âœ?**Next Steps:** Schedule follow-up meeting
+> âœ… **Next Steps:** Schedule follow-up meeting
 **After:**
 > The product launches in Q3. User research showed a preference for simplicity. Next step: schedule a follow-up meeting.
 
 ### 19. Curly quotation marks
-**Problem:** ChatGPT often uses curly quotes (â€?..â€? where the writer or target format uses straight quotes ("...").
+**Problem:** ChatGPT often uses curly quotes (â€œ...â€) where the writer or target format uses straight quotes ("...").
 **Before:**
-> He said â€œthe project is on trackâ€?but others disagreed.
+> He said â€œthe project is on trackâ€ but others disagreed.
 **After:**
 > He said "the project is on track" but others disagreed.
 
@@ -273,13 +273,13 @@ Before returning the rewrite, search for `â€”` and `â€“`. Remove each one unless
 
 ### 23. Filler phrases
 
-**Before â†?After:**
-- "In order to achieve this goal" â†?"To achieve this"
-- "Due to the fact that it was raining" â†?"Because it was raining"
-- "At this point in time" â†?"Now"
-- "In the event that you need help" â†?"If you need help"
-- "The system has the ability to process" â†?"The system can process"
-- "It is important to note that the data shows" â†?"The data shows"
+**Before â†’ After:**
+- "In order to achieve this goal" â†’ "To achieve this"
+- "Due to the fact that it was raining" â†’ "Because it was raining"
+- "At this point in time" â†’ "Now"
+- "In the event that you need help" â†’ "If you need help"
+- "The system has the ability to process" â†’ "The system can process"
+- "It is important to note that the data shows" â†’ "The data shows"
 
 ### 24. Too many qualifiers
 

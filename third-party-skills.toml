@@ -28,7 +28,7 @@ local_path = "skills/humanizer"
 upstream_url = "https://github.com/blader/humanizer"
 source_type = "github"
 tracking = "default-branch-or-release"
-current_source = "main/tag v2.11.0 at 43c97670b563cfa75e4f16ef00c32e933104d10a, downloaded 2026-08-18"
+current_source = "tag v2.11.1 at ebf637bdae86b62a7b006c447bb98cfa0ccc979d, main checked at e2e92e7b4b8229253ed5c8e81dc65463fdeddda5, downloaded 2026-09-01"
 
 preserve_rules = [
   "Keep only the top-level Codex skill at skills/humanizer.",
@@ -80,6 +80,7 @@ upstream_skills_observed = [
   "skills/nature-downloader",
   "skills/nature-experiment-log",
   "skills/nature-figure",
+  "skills/nature-image2ppt",
   "skills/nature-literature-pipeline",
   "skills/nature-paper-card",
   "skills/nature-paper-to-patent",
@@ -110,7 +111,7 @@ local_path = "skills/a-stock-data"
 upstream_url = "https://github.com/simonlin1212/a-stock-data"
 source_type = "github"
 tracking = "default-branch-or-release"
-current_source = "main/tag v3.6.1 at 3a3149dedbe30cda58b5c94387039d7e707cedcd, latest release v3.6.1, downloaded 2026-08-18"
+current_source = "main/tag v3.7.1 at f90d67853b8108f13d286e1df20b357e2c5198a9, latest release v3.7.1, downloaded 2026-09-01"
 
 preserve_rules = [
   "Keep the repository-root skill at skills/a-stock-data.",
@@ -141,7 +142,7 @@ upstream_url = "https://github.com/JuliusBrussee/caveman"
 source_type = "github-subdir"
 upstream_subdir = "skills/caveman"
 tracking = "default-branch-or-release"
-current_source = "main at 766dce6b1394ebb56a3090748d5a0240a5aefb36, latest release v2.1.0, downloaded 2026-08-18"
+current_source = "main/tag v2.4.0 at df2ccd85c94ec3c8289cb62ac020d241ccfb0c60, latest release v2.4.0, downloaded 2026-09-01"
 
 preserve_rules = [
   "Keep only the Codex skill subdirectory at skills/caveman.",
@@ -157,7 +158,7 @@ upstream_url = "https://github.com/ayghri/i-have-adhd"
 source_type = "github-subdir"
 upstream_subdir = "skills/i-have-adhd"
 tracking = "default-branch-or-release"
-current_source = "main at 7680cebf7e0ee3bdd5f7c44104baab573b6b3d5d, downloaded 2026-08-18"
+current_source = "main at cbe69fb83c08a37cf54d5ec9ec6bb88c8bc9973c, downloaded 2026-09-01; registered subdir content unchanged"
 
 preserve_rules = [
   "Keep only the Codex skill subdirectory at skills/i-have-adhd.",
