@@ -53,6 +53,37 @@ class TimestampTests(unittest.TestCase):
             self.assertTrue(end.startswith("2026-07-27T12:56:16"))
             self.assertEqual(sources, ["exp001"])
 
+    def test_split_archive_uses_only_its_declared_run_range(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            metadata = Path(temporary) / "metadata" / "exp004"
+            metadata.mkdir(parents=True)
+            (metadata / "experiment.json").write_text(
+                json.dumps(
+                    {
+                        "runs": {
+                            "exp004_00000": {
+                                "started_at": "2026-07-21T01:00:00Z",
+                                "ended_at": "2026-07-21T01:10:00Z",
+                            },
+                            "exp004_00001": {
+                                "started_at": "2026-07-21T02:00:00Z",
+                                "ended_at": "2026-07-21T02:10:00Z",
+                            },
+                            "exp004_00002": {
+                                "started_at": "2026-07-21T03:00:00Z",
+                                "ended_at": "2026-07-21T03:10:00Z",
+                            },
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            archive = Path(temporary) / "exp004_part1_00000-00001.tar.gz"
+            start, end, sources = scicat.archive_times(Path(temporary) / "metadata", archive)
+            self.assertTrue(start.startswith("2026-07-21T01:00:00"))
+            self.assertTrue(end.startswith("2026-07-21T02:10:00"))
+            self.assertEqual(sources, ["exp004_00000", "exp004_00001"])
+
 
 class RemainingInventoryTests(unittest.TestCase):
     def test_raw_and_transient_content_is_excluded_but_scientific_content_remains(self) -> None:
@@ -183,6 +214,23 @@ class CliTests(unittest.TestCase):
                 ["prepare", "--mode", mode, "--proposal-root", "/data01/example", "--output", "/tmp/plan.json"]
             )
             self.assertEqual(args.mode, mode)
+
+    def test_external_raw_source_is_available(self) -> None:
+        parser = scicat.build_parser()
+        args = parser.parse_args(
+            [
+                "prepare",
+                "--mode",
+                "raw",
+                "--proposal-root",
+                "/data01/example",
+                "--raw-source-dir",
+                "/media/example/tpx3Files",
+                "--output",
+                "/tmp/plan.json",
+            ]
+        )
+        self.assertEqual(args.raw_source_dir, "/media/example/tpx3Files")
 
 
 if __name__ == "__main__":

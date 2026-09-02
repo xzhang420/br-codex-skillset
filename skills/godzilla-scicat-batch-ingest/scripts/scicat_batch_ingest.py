@@ -335,6 +335,37 @@ def timestamp_range(paths: Iterable[Path]) -> tuple[str, str, list[str]]:
     return format_utc(min(starts)), format_utc(max(ends)), sources
 
 
+def split_archive_times(
+    metadata_path: Path, stem: str, first_run: str, last_run: str
+) -> tuple[str, str, list[str]]:
+    obj = read_json(metadata_path)
+    runs = obj.get("runs", {}) if isinstance(obj, dict) else {}
+    if not isinstance(runs, dict):
+        raise BatchError(f"Experiment metadata has no run mapping: {metadata_path}")
+    first = int(first_run)
+    last = int(last_run)
+    if first > last:
+        raise BatchError(f"Split archive has a reversed run range: {stem}")
+    width = max(len(first_run), len(last_run))
+    base = metadata_path.parent.name
+    names = [f"{base}_{index:0{width}d}" for index in range(first, last + 1)]
+    missing = [name for name in names if name not in runs]
+    if missing:
+        raise BatchError(
+            f"Split archive {stem}.tar.gz references runs absent from {metadata_path}: "
+            + ", ".join(missing)
+        )
+    starts: list[dt.datetime] = []
+    ends: list[dt.datetime] = []
+    for name in names:
+        run = runs[name]
+        if not isinstance(run, dict) or not run.get("started_at") or not run.get("ended_at"):
+            raise BatchError(f"Run {name} lacks complete timestamps in {metadata_path}")
+        starts.append(parse_time(str(run["started_at"])))
+        ends.append(parse_time(str(run["ended_at"])))
+    return format_utc(min(starts)), format_utc(max(ends)), names
+
+
 def grouped_member_names(archive: Path, stem: str) -> list[str]:
     names: set[str] = set()
     try:
@@ -353,6 +384,12 @@ def archive_times(metadata_dir: Path, archive: Path) -> tuple[str, str, list[str
     exact = metadata_dir / stem / "experiment.json"
     if exact.is_file():
         return timestamp_range([exact])
+    split = re.fullmatch(r"(.+)_part\d+_(\d+)-(\d+)", stem)
+    if split:
+        base, first_run, last_run = split.groups()
+        metadata_path = metadata_dir / base / "experiment.json"
+        if metadata_path.is_file():
+            return split_archive_times(metadata_path, stem, first_run, last_run)
     tokens = [token.lower() for token in stem.split("_") if token]
     if tokens and all(token in {"focus", "test"} for token in tokens):
         names = grouped_member_names(archive, stem)
@@ -632,6 +669,16 @@ def build_plan(args: argparse.Namespace) -> int:
     if output.exists():
         raise BatchError(f"Refusing to overwrite an existing plan; resume it or choose a new --output path: {output}")
     layout = locate_layout(root)
+    if args.raw_source_dir:
+        raw_argument = Path(args.raw_source_dir).expanduser()
+        if raw_argument.is_symlink():
+            raise BatchError(f"External raw-source directory must not be a symbolic link: {raw_argument}")
+        raw_source = raw_argument.resolve()
+        if not raw_source.is_dir():
+            raise BatchError(f"External raw-source directory does not exist: {raw_source}")
+        if raw_source == output.parent or raw_source in output.parents:
+            raise BatchError("The plan/control directory must be outside the external raw-source directory.")
+        layout = {**layout, "raw": raw_source}
     number = proposal_number(root)
     prefix = args.pid_prefix
     proposal_id = proposal_pid(args.proposal_id or number, prefix)
@@ -1283,6 +1330,10 @@ def build_parser() -> argparse.ArgumentParser:
     prepare = sub.add_parser("prepare", help="Create a deterministic raw/all/remaining plan.")
     prepare.add_argument("--mode", required=True, choices=("all", "raw", "remaining"))
     prepare.add_argument("--proposal-root", required=True)
+    prepare.add_argument(
+        "--raw-source-dir",
+        help="Optional directory containing raw .tar.gz files when they are stored outside the proposal tree.",
+    )
     prepare.add_argument("--output", required=True, help="Output batch_plan.json path.")
     prepare.add_argument("--proposal-id")
     prepare.add_argument("--creation-location")

@@ -33,6 +33,13 @@ If immediate experiment directories still need verified `.tar.gz` archives,
 use `godzilla-archive-tpx3-experiments` first. Do not modify the standalone
 `/home/localadmin/Programs/scicat_batch_ingest` process while it is running.
 
+If verified raw archives were moved to a separate disk, keep `--proposal-root`
+pointed at the canonical proposal tree so its metadata remains authoritative,
+and pass the archive folder with `--raw-source-dir`. Do not copy multi-terabyte
+archives back merely to recreate the standard layout. Explicit split archive
+names such as `exp004_part1_00000-00035.tar.gz` map to only that run range in
+the base experiment metadata.
+
 ## Credential and safety rules
 
 - Request the SciCat token through hidden terminal input. Keep it in memory
@@ -73,6 +80,8 @@ UV_CACHE_DIR=/tmp/uv-cache-godzilla-scicat uv run \
 
 Replace `raw` with the user's chosen `all` or `remaining`. Keep control files
 under `/data01/scicat_ingest/P########`, outside the proposal root.
+For raw archives stored elsewhere, add
+`--raw-source-dir /media/.../tpx3Files_..._P########` to `prepare`.
 
 Validate without changing SciCat:
 

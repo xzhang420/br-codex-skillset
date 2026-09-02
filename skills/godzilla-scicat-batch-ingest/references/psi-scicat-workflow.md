@@ -12,6 +12,12 @@ This skill targets a standard LumaCam proposal tree at any PSI instrument:
         └── metadata/<experiment>/experiment.json
 ```
 
+Verified raw archives may reside in a separate directory or mounted disk. In
+that case the canonical proposal root still supplies `experiment.json`
+metadata, while `--raw-source-dir` selects the directory used as SciCat's
+`sourceFolder`. Split archives named `_partN_FIRST-LAST.tar.gz` use only the
+declared contiguous run range from the base experiment metadata.
+
 Each verified raw `.tar.gz` is one raw SciCat dataset. The optional remaining
 dataset is a single derived dataset whose `inputDatasets` lists every raw PID.
 SciCat documents `inputDatasets` as provenance links from derived data to its
