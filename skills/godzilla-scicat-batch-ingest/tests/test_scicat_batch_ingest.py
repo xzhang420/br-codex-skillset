@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import json
 import os
+import tarfile
 import tempfile
 import unittest
 import urllib.error
@@ -79,10 +81,42 @@ class TimestampTests(unittest.TestCase):
                 encoding="utf-8",
             )
             archive = Path(temporary) / "exp004_part1_00000-00001.tar.gz"
-            start, end, sources = scicat.archive_times(Path(temporary) / "metadata", archive)
+            start, end, sources, warning = scicat.archive_times(Path(temporary) / "metadata", archive)
             self.assertTrue(start.startswith("2026-07-21T01:00:00"))
             self.assertTrue(end.startswith("2026-07-21T02:10:00"))
             self.assertEqual(sources, ["exp004_00000", "exp004_00001"])
+            self.assertIsNone(warning)
+
+    def test_incomplete_acquisition_uses_latest_archived_tpx3_mtime(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            metadata = root / "metadata" / "exp130"
+            metadata.mkdir(parents=True)
+            (metadata / "experiment.json").write_text(
+                json.dumps(
+                    {
+                        "status": "in_progress",
+                        "runs": {
+                            "exp130_00000": {
+                                "started_at": "2026-07-25T13:13:32Z",
+                                "status": "acquiring",
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            archive = root / "exp130.tar.gz"
+            with tarfile.open(archive, "w:gz") as handle:
+                member = tarfile.TarInfo("exp130/exp130_00000/sample.tpx3")
+                member.size = 1
+                member.mtime = 1784985225  # 2026-07-25T13:13:45Z
+                handle.addfile(member, io.BytesIO(b"x"))
+            start, end, sources, warning = scicat.archive_times(root / "metadata", archive)
+            self.assertEqual(start, "2026-07-25T13:13:32.000000Z")
+            self.assertEqual(end, "2026-07-25T13:13:45.000000Z")
+            self.assertEqual(sources, ["exp130"])
+            self.assertIn("latest archived .tpx3 member mtime", warning or "")
 
 
 class RemainingInventoryTests(unittest.TestCase):

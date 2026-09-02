@@ -379,17 +379,69 @@ def grouped_member_names(archive: Path, stem: str) -> list[str]:
     return sorted(names)
 
 
-def archive_times(metadata_dir: Path, archive: Path) -> tuple[str, str, list[str]]:
+def archived_tpx3_end_time(archive: Path) -> dt.datetime:
+    latest: int | float | None = None
+    try:
+        with tarfile.open(archive, mode="r|gz") as handle:
+            for member in handle:
+                if member.isfile() and member.name.lower().endswith(".tpx3"):
+                    latest = member.mtime if latest is None else max(latest, member.mtime)
+    except (OSError, tarfile.TarError) as exc:
+        raise BatchError(f"Could not inspect incomplete acquisition archive {archive}: {exc}") from exc
+    if latest is None:
+        raise BatchError(f"Incomplete acquisition archive contains no .tpx3 files: {archive}")
+    return dt.datetime.fromtimestamp(latest, tz=dt.timezone.utc)
+
+
+def incomplete_archive_times(
+    metadata_path: Path, archive: Path
+) -> tuple[str, str, list[str], str] | None:
+    obj = read_json(metadata_path)
+    runs = obj.get("runs", {}) if isinstance(obj, dict) else {}
+    if not isinstance(runs, dict):
+        return None
+    starts = [
+        parse_time(str(run["started_at"]))
+        for run in runs.values()
+        if isinstance(run, dict) and run.get("started_at")
+    ]
+    ends = [
+        parse_time(str(run["ended_at"]))
+        for run in runs.values()
+        if isinstance(run, dict) and run.get("ended_at")
+    ]
+    if not starts or ends:
+        return None
+    start = min(starts)
+    end = archived_tpx3_end_time(archive)
+    if end < start:
+        raise BatchError(
+            f"Latest archived .tpx3 mtime precedes acquisition start in {metadata_path}: "
+            f"{format_utc(end)} < {format_utc(start)}"
+        )
+    warning = (
+        f"{archive.name} has started_at but no ended_at; endTime {format_utc(end)} "
+        "was derived from the latest archived .tpx3 member mtime."
+    )
+    return format_utc(start), format_utc(end), [metadata_path.parent.name], warning
+
+
+def archive_times(metadata_dir: Path, archive: Path) -> tuple[str, str, list[str], str | None]:
     stem = archive.name[: -len(".tar.gz")]
     exact = metadata_dir / stem / "experiment.json"
     if exact.is_file():
-        return timestamp_range([exact])
+        fallback = incomplete_archive_times(exact, archive)
+        if fallback:
+            return fallback
+        start, end, sources = timestamp_range([exact])
+        return start, end, sources, None
     split = re.fullmatch(r"(.+)_part\d+_(\d+)-(\d+)", stem)
     if split:
         base, first_run, last_run = split.groups()
         metadata_path = metadata_dir / base / "experiment.json"
         if metadata_path.is_file():
-            return split_archive_times(metadata_path, stem, first_run, last_run)
+            start, end, sources = split_archive_times(metadata_path, stem, first_run, last_run)
+            return start, end, sources, None
     tokens = [token.lower() for token in stem.split("_") if token]
     if tokens and all(token in {"focus", "test"} for token in tokens):
         names = grouped_member_names(archive, stem)
@@ -401,7 +453,8 @@ def archive_times(metadata_dir: Path, archive: Path) -> tuple[str, str, list[str
                 + ", ".join(path.parent.name for path in missing)
             )
         if paths:
-            return timestamp_range(paths)
+            start, end, sources = timestamp_range(paths)
+            return start, end, sources, None
     raise BatchError(f"No unambiguous timestamp mapping exists for {archive.name}.")
 
 
@@ -480,7 +533,9 @@ def raw_entries(
         if file_stat.st_size > RECOMMENDED_MAX_BYTES:
             warnings.append(f"{archive.name} is above the recommended 1 TB dataset size.")
         stem = archive.name[: -len(".tar.gz")]
-        start, end, sources = archive_times(layout["metadata"], archive)
+        start, end, sources, timestamp_warning = archive_times(layout["metadata"], archive)
+        if timestamp_warning:
+            warnings.append(timestamp_warning)
         dataset_dir = control_root / "raw" / stem
         metadata_path = dataset_dir / "metadata.json"
         listing_path = dataset_dir / "filelisting.txt"
@@ -499,21 +554,22 @@ def raw_entries(
         }
         write_control_json(metadata_path, metadata)
         write_control_text(listing_path, archive.name + "\n")
-        entries.append(
-            {
-                "kind": "raw",
-                "datasetName": metadata["datasetName"],
-                "proposalId": proposal_id,
-                "ownerGroup": owner_group,
-                "sourceFolder": str(layout["raw"]),
-                "metadata": str(metadata_path),
-                "filelisting": str(listing_path),
-                "sourceFile": str(archive),
-                "size": file_stat.st_size,
-                "mtimeNs": file_stat.st_mtime_ns,
-                "timestampSources": sources,
-            }
-        )
+        entry = {
+            "kind": "raw",
+            "datasetName": metadata["datasetName"],
+            "proposalId": proposal_id,
+            "ownerGroup": owner_group,
+            "sourceFolder": str(layout["raw"]),
+            "metadata": str(metadata_path),
+            "filelisting": str(listing_path),
+            "sourceFile": str(archive),
+            "size": file_stat.st_size,
+            "mtimeNs": file_stat.st_mtime_ns,
+            "timestampSources": sources,
+        }
+        if timestamp_warning:
+            entry["timestampWarning"] = timestamp_warning
+        entries.append(entry)
     return entries, warnings
 
 

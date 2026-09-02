@@ -52,6 +52,10 @@ the base experiment metadata.
   the plan, state, PID, and logs, inspect, then resume the same plan.
 - Preserve actual acquisition timestamps from each `experiment.json`. Do not
   edit the official proposal schedule to make those times match.
+- For an interrupted acquisition that has `started_at` but no `ended_at`, the
+  helper may derive `endTime` from the latest `.tpx3` member mtime inside the
+  verified archive. It must record this explicitly as a plan warning; never
+  substitute the planned duration or official proposal schedule.
 - Treat archive-job submission as incomplete. Physical tape completion requires
   lifecycle `archiveStatusMessage` `datasetOnArchive` (or PSI's historical
   `datasetOnAchive`) and `retrievable: true`.

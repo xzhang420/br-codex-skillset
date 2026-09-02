@@ -18,6 +18,11 @@ metadata, while `--raw-source-dir` selects the directory used as SciCat's
 `sourceFolder`. Split archives named `_partN_FIRST-LAST.tar.gz` use only the
 declared contiguous run range from the base experiment metadata.
 
+If an interrupted acquisition contains a real `started_at` but no `ended_at`,
+derive its end from the latest `.tpx3` member mtime in the verified archive and
+record the provenance as a plan warning. Do not use the planned measurement
+duration or the proposal schedule as a substitute for observed time.
+
 Each verified raw `.tar.gz` is one raw SciCat dataset. The optional remaining
 dataset is a single derived dataset whose `inputDatasets` lists every raw PID.
 SciCat documents `inputDatasets` as provenance links from derived data to its
