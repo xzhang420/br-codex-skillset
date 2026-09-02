@@ -35,14 +35,16 @@ def format_bytes(value: int) -> str:
 
 def experiments_root(path: Path) -> Path:
     resolved = path.expanduser().resolve()
-    if resolved.name == "experiments" and resolved.is_dir():
+    if resolved.name in {"experiment", "experiments"} and resolved.is_dir():
         return resolved
-    candidate = resolved / "data" / "experiments"
-    if candidate.is_dir():
-        return candidate
-    raise ValueError(
-        f"Could not find data/experiments below proposal root: {resolved}"
-    )
+    candidates = [
+        candidate
+        for name in ("experiment", "experiments")
+        if (candidate := resolved / "data" / name).is_dir()
+    ]
+    if len(candidates) == 1:
+        return candidates[0]
+    raise ValueError(f"Expected one data/experiment[s] layout below proposal root: {resolved}")
 
 
 def validate_experiment_name(name: str) -> None:

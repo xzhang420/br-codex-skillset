@@ -10,6 +10,7 @@ Use a strict two-turn workflow. Never combine the audit and deletion in one turn
 ## 1. Resolve and audit
 
 1. Resolve the proposal root and the exact experiment directory name. Reject partial, glob, or ambiguous matches.
+   Accept exactly one `data/experiment` or `data/experiments` layout.
 2. Check global processes read-only for the exact experiment name. If acquisition, reconstruction, aggregation, or recovery is active, do not delete; report the process and require the user to stop it safely first.
 3. Run the bundled read-only auditor:
 
