@@ -17,6 +17,7 @@ import hashlib
 import json
 import os
 import re
+import selectors
 import shutil
 import stat
 import subprocess
@@ -37,6 +38,9 @@ DEFAULT_RATE_LOCK = Path("/tmp/godzilla-scicat-api-rate.lock")
 DATASET_PID_RE = re.compile(r"Dataset created:\s*([^\s]+)")
 JOB_ID_RE = re.compile(
     r"(?mi)^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$"
+)
+RSYNC_PROGRESS_RE = re.compile(
+    r"(?P<bytes>[\d,]+)\s+(?P<percent>\d{1,3})%\s+(?P<rate>\S+/s)\s+(?P<eta>\d+:\d{2}:\d{2})"
 )
 TAPE_STATES = {"datasetonarchive", "datasetonachive"}
 ARCHIVE_SUBMITTED_STATES = {
@@ -877,24 +881,100 @@ def workflow_lock(plan_path: Path) -> Iterator[None]:
         handle.close()
 
 
+def rsync_progress_summary(line: str) -> str | None:
+    """Return a compact status for an rsync progress record."""
+    match = RSYNC_PROGRESS_RE.search(line)
+    if not match:
+        return None
+    return f"{match.group('percent')}% | {match.group('rate')} | ETA {match.group('eta')}"
+
+
+def write_live_status(message: str, *, finish: bool = False) -> None:
+    """Replace one interactive terminal line; never emit progress-line scrollback."""
+    width = max(20, shutil.get_terminal_size((120, 24)).columns)
+    if len(message) >= width:
+        message = "…" + message[-(width - 2) :]
+    end = "\n" if finish else ""
+    print(f"\r\033[2K{message}", end=end, flush=True)
+
+
+def elapsed_summary(seconds: float) -> str:
+    elapsed = max(0, int(seconds))
+    hours, remainder = divmod(elapsed, 3600)
+    minutes, secs = divmod(remainder, 60)
+    if hours:
+        return f"{hours}h {minutes}m {secs}s"
+    if minutes:
+        return f"{minutes}m {secs}s"
+    return f"{secs}s"
+
+
 def run_logged(command: list[str], log_path: Path, label: str) -> tuple[int, str]:
-    """Run quietly, writing verbose output to a file and one heartbeat per minute."""
+    """Log full output while showing rsync progress on one changing terminal line."""
     log_path.parent.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
     next_update = started + 60
     print(f"Starting {label}; detailed output: {log_path}")
     start_offset = log_path.stat().st_size if log_path.exists() else 0
-    with log_path.open("a", encoding="utf-8") as log:
-        log.write(f"\n[{format_utc(utc_now())}] START {label}\n")
-        process = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT, text=True)
-        while process.poll() is None:
-            time.sleep(1)
-            if time.monotonic() >= next_update:
-                elapsed = int(time.monotonic() - started)
-                print(f"{label} still running ({elapsed // 60} min); see {log_path}")
-                next_update += 60
-        code = int(process.returncode)
-        log.write(f"[{format_utc(utc_now())}] EXIT {code}\n")
+    interactive = sys.stdout.isatty()
+    live_status = False
+    pending = bytearray()
+    with log_path.open("ab") as log:
+        log.write(f"\n[{format_utc(utc_now())}] START {label}\n".encode("utf-8"))
+        log.flush()
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        if process.stdout is None:
+            raise BatchError(f"Could not capture output for {label}.")
+        selector = selectors.DefaultSelector()
+        selector.register(process.stdout, selectors.EVENT_READ)
+        try:
+            while selector.get_map():
+                events = selector.select(timeout=1.0)
+                for key, _ in events:
+                    chunk = os.read(key.fd, 65536)
+                    if not chunk:
+                        selector.unregister(key.fileobj)
+                        continue
+                    log.write(chunk)
+                    log.flush()
+                    pending.extend(chunk)
+                    while True:
+                        separators = [
+                            index for index in (pending.find(b"\r"), pending.find(b"\n")) if index >= 0
+                        ]
+                        if not separators:
+                            break
+                        boundary = min(separators)
+                        record = bytes(pending[:boundary]).decode("utf-8", errors="replace")
+                        del pending[: boundary + 1]
+                        progress = rsync_progress_summary(record)
+                        if progress and interactive:
+                            write_live_status(f"{label}: {progress}")
+                            live_status = True
+                now = time.monotonic()
+                if process.poll() is None and now >= next_update:
+                    elapsed = elapsed_summary(now - started)
+                    message = f"{label} still running ({elapsed}); details: {log_path}"
+                    if interactive:
+                        write_live_status(message)
+                        live_status = True
+                    else:
+                        print(message)
+                    next_update = now + 60
+        finally:
+            selector.close()
+        code = int(process.wait())
+        process.stdout.close()
+        if pending:
+            progress = rsync_progress_summary(pending.decode("utf-8", errors="replace"))
+            if progress and interactive:
+                write_live_status(f"{label}: {progress}")
+                live_status = True
+        log.write(f"\n[{format_utc(utc_now())}] EXIT {code}\n".encode("utf-8"))
+        log.flush()
+    if live_status:
+        outcome = "finished" if code == 0 else f"failed (exit {code})"
+        write_live_status(f"{label}: {outcome} in {elapsed_summary(time.monotonic() - started)}", finish=True)
     with log_path.open("rb") as log:
         log.seek(start_offset)
         output = log.read().decode("utf-8", errors="replace")
@@ -1067,7 +1147,7 @@ def resume_copy(
         "-e",
         "ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10",
         "-avx",
-        "--progress",
+        "--info=progress2",
         "--partial",
         "--stderr=error",
         source + "/",
@@ -1163,6 +1243,7 @@ def validation_allows(plan_path: Path, state: dict[str, Any], phase: str) -> Non
 
 
 def execute_command(args: argparse.Namespace) -> int:
+    command_started = time.monotonic()
     plan_path = Path(args.plan).resolve()
     output = Path(args.output).resolve()
     plan = load_plan(plan_path)
@@ -1251,10 +1332,26 @@ def execute_command(args: argparse.Namespace) -> int:
                 raise
             report["datasets"].append(entry["datasetName"])
             atomic_json(output, report)
-    report.update({"ok": True, "finishedAt": format_utc(utc_now())})
+    elapsed_seconds = time.monotonic() - command_started
+    planned_bytes = sum(int(entry.get("size", 0)) for entry in entries)
+    report.update(
+        {
+            "ok": True,
+            "finishedAt": format_utc(utc_now()),
+            "elapsedSeconds": round(elapsed_seconds, 3),
+            "plannedBytes": planned_bytes,
+        }
+    )
     atomic_json(output, report)
-    print(f"{phase.capitalize()} archive jobs submitted. This is not yet tape confirmation.")
-    print("Run monitor with a 600-second interval to wait for physical archive confirmation.")
+    print("Execution summary:")
+    print(f"  Proposal: {plan['proposalNumber']} ({plan['proposalId']})")
+    print(
+        f"  {phase.capitalize()} datasets handled: {len(report['datasets'])}/{len(entries)} "
+        f"({planned_bytes / 10**12:.3f} TB)"
+    )
+    print(f"  Elapsed: {elapsed_summary(elapsed_seconds)}; report: {output}")
+    print("  Archive jobs submitted; physical tape confirmation is still pending.")
+    print("Next: run monitor with a 600-second interval.")
     return 0
 
 

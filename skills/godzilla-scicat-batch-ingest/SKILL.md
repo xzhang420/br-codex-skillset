@@ -107,9 +107,11 @@ UV_CACHE_DIR=/tmp/uv-cache-godzilla-scicat uv run \
   --output "${PLAN%/*}/execution_report.json"
 ```
 
-The terminal remains concise; rsync/scicat-cli details go into per-dataset log
-files. A successful `execute` means jobs were submitted, not that data are on
-tape.
+The terminal shows live rsync progress by replacing one status line instead of
+printing a new line every second; full rsync/scicat-cli details go into
+per-dataset log files. At successful completion it prints a short proposal,
+dataset-count, size, elapsed-time, report-path, and tape-pending summary. A
+successful `execute` means jobs were submitted, not that data are on tape.
 
 For a one-shot check:
 

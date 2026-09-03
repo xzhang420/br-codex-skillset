@@ -267,5 +267,52 @@ class CliTests(unittest.TestCase):
         self.assertEqual(args.raw_source_dir, "/media/example/tpx3Files")
 
 
+class TerminalOutputTests(unittest.TestCase):
+    class InteractiveBuffer(io.StringIO):
+        def isatty(self) -> bool:
+            return True
+
+    def test_rsync_progress_is_compacted(self) -> None:
+        self.assertEqual(
+            scicat.rsync_progress_summary(" 12,976,390,144   7%   11.19MB/s    3:49:36  "),
+            "7% | 11.19MB/s | ETA 3:49:36",
+        )
+        self.assertIsNone(scicat.rsync_progress_summary("sending incremental file list"))
+
+    def test_live_status_reuses_one_terminal_line(self) -> None:
+        terminal = self.InteractiveBuffer()
+        with mock.patch.object(scicat.sys, "stdout", terminal):
+            scicat.write_live_status("copy: 10%")
+            scicat.write_live_status("copy: 20%")
+            scicat.write_live_status("copy: finished", finish=True)
+        output = terminal.getvalue()
+        self.assertEqual(output.count("\n"), 1)
+        self.assertEqual(output.count("\r"), 3)
+        self.assertIn("copy: 20%", output)
+
+    def test_run_logged_keeps_streamed_progress_on_one_terminal_line(self) -> None:
+        terminal = self.InteractiveBuffer()
+        with tempfile.TemporaryDirectory() as temporary, mock.patch.object(scicat.sys, "stdout", terminal):
+            log = Path(temporary) / "copy.log"
+            code, output = scicat.run_logged(
+                [
+                    "/bin/sh",
+                    "-c",
+                    "printf '1,000 10%% 1.00MB/s 0:00:09\\r10,000 100%% 1.00MB/s 0:00:00\\r'",
+                ],
+                log,
+                "copy dataset",
+            )
+        self.assertEqual(code, 0)
+        self.assertIn("10,000 100%", output)
+        self.assertEqual(terminal.getvalue().count("\n"), 2)
+        self.assertGreaterEqual(terminal.getvalue().count("\r"), 3)
+
+    def test_elapsed_summary_is_short(self) -> None:
+        self.assertEqual(scicat.elapsed_summary(5), "5s")
+        self.assertEqual(scicat.elapsed_summary(65), "1m 5s")
+        self.assertEqual(scicat.elapsed_summary(3665), "1h 1m 5s")
+
+
 if __name__ == "__main__":
     unittest.main()
