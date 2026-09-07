@@ -32,7 +32,7 @@ current_source = "tag v2.11.1 at ebf637bdae86b62a7b006c447bb98cfa0ccc979d, main 
 
 preserve_rules = [
   "Keep only the top-level Codex skill at skills/humanizer.",
-  "Preserve the Hermes Agent port metadata when syncing source files.",
+  "Preserve the Hermes Agent port metadata under the supported metadata mapping; do not retain author or platforms as unsupported top-level frontmatter fields.",
   "Keep upstream LICENSE when syncing source files.",
   "Run git diff --check after preparing any candidate update."
 ]
