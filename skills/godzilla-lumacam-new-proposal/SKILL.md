@@ -57,7 +57,7 @@ The script must complete all of these together:
 5. Set `config_pixel_path` and `config_dacs_path` in `python/settings_installation.py`.
 6. Replace `DEFAULT_EMAIL_TO` in `monitor_dataAcq_sumImages.py` with exactly the requested deduplicated recipient list. This is a workstation-wide monitor default for subsequent acquisitions, not proposal metadata; it intentionally replaces the preceding campaign's list. Do not change the sender address unless the user separately requests it.
 7. Update the pixel and DAC calibration URLs in every `tpxAcqPhotonTest.py` below `/data01/data_acquisition`.
-8. Set `series_dir` in `/home/localadmin/Programs/tpx3cam-analysis/TPX3_batch_focus.ipynb` to `/data01/<proposal-name>/data/experiments/tpx3Files`. The notebook derives its cache from this path and must therefore resolve it to `/data01/<proposal-name>/data/experiments/.work/batch_focus_cache`, never to the Programs directory.
+8. Detect the template's actual acquisition root: new templates use `data/experiment`; older production templates may still use `data/experiments`. Refuse a template containing both. Set `series_dir` in `/home/localadmin/Programs/tpx3cam-analysis/TPX3_batch_focus.ipynb` to that same root's `tpx3Files` directory inside the new proposal. Its cache must resolve to the same root's `.work/batch_focus_cache`, never to the Programs directory. Do not hard-code a different root or rename existing proposal data during setup.
 9. Validate the resulting paths and report the active `parameterSettings.json`; do not change processing thresholds unless the user explicitly requests new values.
 10. Report any process holding detector UDP port 8192. Never terminate a process without first identifying the exact owner and obtaining authorization when needed.
 
@@ -67,11 +67,11 @@ If a validation or write fails, report the failing path. Do not substitute an ol
 
 Independently confirm that:
 
-- `/data01/<proposal>/data/experiments/` contains the standard acquisition subdirectories and no `layout.json` is required;
+- `/data01/<proposal>/data/experiment/` (or the copied older template's `data/experiments/`) contains the standard acquisition subdirectories and no `layout.json` is required;
 - all configured calibration files resolve inside the requested calibration directory;
 - `DEFAULT_EMAIL_TO` in `monitor_dataAcq_sumImages.py` contains exactly the requested deduplicated recipients;
 - both photon-test copies use the same calibration pair;
-- `TPX3_batch_focus.ipynb` points at `/data01/<proposal>/data/experiments/tpx3Files` and its derived cache location is `/data01/<proposal>/data/experiments/.work/batch_focus_cache`;
+- `TPX3_batch_focus.ipynb` points at the selected acquisition root's `tpx3Files` and its derived cache location is that root's `.work/batch_focus_cache`;
 - `parameterSettings.json` remains the active processing-parameter file;
 - no Sophy, Serval, or acquisition process unexpectedly owns UDP port 8192.
 

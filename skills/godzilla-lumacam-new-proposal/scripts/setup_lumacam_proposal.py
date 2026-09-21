@@ -161,7 +161,10 @@ def validate_shell_text(text: str, path: Path) -> None:
 		raise SetupError(f"Generated shell is invalid for {path}: {result.stderr.strip()}")
 
 
-def prepare_batch_focus_notebook_text(notebook_path: Path, proposal_dir: Path) -> str:
+def prepare_batch_focus_notebook_text(
+	notebook_path: Path, proposal_dir: Path,
+	data_root_relative: Path = Path("data/experiment"),
+) -> str:
 	"""Point the batch-focus notebook at this proposal's TPX3 root."""
 	notebook_path = require_file(notebook_path, "Batch-focus notebook")
 	try:
@@ -173,7 +176,7 @@ def prepare_batch_focus_notebook_text(notebook_path: Path, proposal_dir: Path) -
 	if not isinstance(cells, list):
 		raise SetupError(f"Notebook has no valid cells list: {notebook_path}")
 
-	target = proposal_dir / "data/experiments/tpx3Files"
+	target = proposal_dir / data_root_relative / "tpx3Files"
 	assignments = {
 		"series_dir": f"Path({str(target)!r})",
 		"cache_dir": 'series_dir.parent / ".work" / "batch_focus_cache"',
@@ -231,6 +234,7 @@ def prepare_file_updates(
 	dacs: Path,
 	batch_focus_notebook: Path,
 	recipients: tuple[str, ...],
+	data_root_relative: Path = Path("data/experiment"),
 ) -> dict[Path, str]:
 	settings_path = require_file(repository / "python/settings_installation.py", "Installation settings")
 	acquisition_path = require_file(repository / "acquisitionSettings.sh", "Acquisition settings")
@@ -270,14 +274,20 @@ def prepare_file_updates(
 
 	batch_focus_notebook = require_file(batch_focus_notebook, "Batch-focus notebook")
 	updates[batch_focus_notebook] = prepare_batch_focus_notebook_text(
-		batch_focus_notebook, proposal_dir
+		batch_focus_notebook, proposal_dir, data_root_relative
 	)
 	return updates
 
 
 def validate_template(template: Path) -> Path:
 	template = require_directory(template, "Proposal template")
-	data_root = require_directory(template / "data/experiments", "Template data root")
+	roots = [template / "data" / name for name in ("experiment", "experiments")
+		if (template / "data" / name).exists() or (template / "data" / name).is_symlink()]
+	if len(roots) != 1:
+		raise SetupError(f"Expected exactly one data/experiment or data/experiments root in {template}; found {len(roots)}")
+	data_root = require_directory(roots[0], "Template data root")
+	if not data_root.is_relative_to(template):
+		raise SetupError(f"Template data root escapes template: {data_root}")
 	for name in ("tpx3Files", "final", "derived", "logs", "metadata", ".work"):
 		require_directory(data_root / name, f"Template {name} directory")
 	require_file(template / "documentation/experiment_log.md", "Experiment log")
@@ -370,9 +380,10 @@ def main(argv: list[str] | None = None) -> int:
 		data_base = require_directory(args.data_base, "Proposal parent")
 		photon_root = require_directory(args.photon_test_root, "Photon-test root")
 		template = repository / "lumacam_proposal_template"
-		validate_template(template)
+		template_data_root = validate_template(template)
+		data_root_relative = template_data_root.relative_to(template)
 		require_directory(
-			template / "data/experiments/tpx3Files", "Template TPX3 data directory"
+			template_data_root / "tpx3Files", "Template TPX3 data directory"
 		)
 		processing_path = validate_processing_parameters(repository)
 		pixel, dacs = calibration_pair(args.calibration_dir)
@@ -391,6 +402,7 @@ def main(argv: list[str] | None = None) -> int:
 			dacs,
 			batch_focus_notebook,
 			recipients,
+			data_root_relative,
 		)
 
 		print(f"Proposal: {proposal_dir}")
@@ -399,10 +411,11 @@ def main(argv: list[str] | None = None) -> int:
 		print(f"DAC calibration: {dacs}")
 		print(f"Monitored-acquisition recipients: {', '.join(recipients)}")
 		print(f"Processing parameters (unchanged): {processing_path}")
-		print(f"Batch-focus TPX3 root: {proposal_dir / 'data/experiments/tpx3Files'}")
+		data_root = proposal_dir / data_root_relative
+		print(f"Batch-focus TPX3 root: {data_root / 'tpx3Files'}")
 		print(
 			f"Batch-focus cache: "
-			f"{proposal_dir / 'data/experiments/.work/batch_focus_cache'}"
+			f"{data_root / '.work/batch_focus_cache'}"
 		)
 		for path in updates:
 			print(f"Update: {path}")
@@ -431,7 +444,7 @@ def main(argv: list[str] | None = None) -> int:
 		notebook_source_contains_all(
 			batch_focus_notebook,
 			(
-				str(proposal_dir / "data/experiments/tpx3Files"),
+				str(data_root / "tpx3Files"),
 				'cache_dir = series_dir.parent / ".work" / "batch_focus_cache"',
 				(
 					'output_csv = series_dir.parents[2] / "documentation" / '
