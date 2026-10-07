@@ -28,7 +28,7 @@ local_path = "skills/humanizer"
 upstream_url = "https://github.com/blader/humanizer"
 source_type = "github"
 tracking = "default-branch-or-release"
-current_source = "tag v2.11.1 at ebf637bdae86b62a7b006c447bb98cfa0ccc979d, main checked at e2e92e7b4b8229253ed5c8e81dc65463fdeddda5, downloaded 2026-09-01"
+current_source = "tag v3.1.0/main at 225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8, downloaded 2026-10-07"
 
 preserve_rules = [
   "Keep only the top-level Codex skill at skills/humanizer.",
@@ -111,7 +111,7 @@ local_path = "skills/a-stock-data"
 upstream_url = "https://github.com/simonlin1212/a-stock-data"
 source_type = "github"
 tracking = "default-branch-or-release"
-current_source = "main/tag v3.7.1 at f90d67853b8108f13d286e1df20b357e2c5198a9, latest release v3.7.1, downloaded 2026-09-01"
+current_source = "main/tag v3.10.1 at 8f6a6a53a59813bf5f010875f16f794fdc4f44f4, latest release v3.10.1, downloaded 2026-10-07"
 
 preserve_rules = [
   "Keep the repository-root skill at skills/a-stock-data.",
@@ -126,7 +126,7 @@ local_path = "skills/global-stock-data"
 upstream_url = "https://github.com/simonlin1212/global-stock-data"
 source_type = "github"
 tracking = "default-branch-or-release"
-current_source = "main/tag v2.0.3 at c0b3ed8d8a1fdff0932e5899fc64a5994308a5ef, downloaded 2026-08-03"
+current_source = "main at 99a09ef0aea859bc5912f3a1ede56b35795401df, latest release v2.0.3, downloaded 2026-10-07"
 
 preserve_rules = [
   "Keep the repository-root skill at skills/global-stock-data.",
@@ -142,7 +142,7 @@ upstream_url = "https://github.com/JuliusBrussee/caveman"
 source_type = "github-subdir"
 upstream_subdir = "skills/caveman"
 tracking = "default-branch-or-release"
-current_source = "main/tag v2.4.0 at df2ccd85c94ec3c8289cb62ac020d241ccfb0c60, latest release v2.4.0, downloaded 2026-09-01"
+current_source = "tag v3.1.0 at 8af1f1b9b1346bca0722a1556f119b4e6675cc96, main checked at 99aafe151a1be72be783e662858e8a0955add59f, downloaded 2026-10-07"
 
 preserve_rules = [
   "Keep only the Codex skill subdirectory at skills/caveman.",
@@ -158,7 +158,7 @@ upstream_url = "https://github.com/ayghri/i-have-adhd"
 source_type = "github-subdir"
 upstream_subdir = "skills/i-have-adhd"
 tracking = "default-branch-or-release"
-current_source = "main at cbe69fb83c08a37cf54d5ec9ec6bb88c8bc9973c, downloaded 2026-09-01; registered subdir content unchanged"
+current_source = "main at 723af7d9afaf43eb871dbcce6129e2bf80de90d5, downloaded 2026-10-07"
 
 preserve_rules = [
   "Keep only the Codex skill subdirectory at skills/i-have-adhd.",
@@ -173,7 +173,7 @@ upstream_url = "https://github.com/google-deepmind/science-skills"
 source_type = "github-collection"
 upstream_subdir = "skills"
 tracking = "default-branch-or-release"
-current_source = "main at 0b42509800f49e6eb7809505d96e20a890ef99bd, downloaded 2026-07-09"
+current_source = "main/tag v1.2.1 at 68832757cbbf941c620b71df5756cf6e5cc287b0, downloaded 2026-10-07"
 
 local_paths = [
   "skills/alphafold_database_fetch_and_analyze",

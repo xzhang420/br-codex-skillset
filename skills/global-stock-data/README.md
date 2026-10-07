@@ -17,6 +17,16 @@
   <a href="#data-sources"><img src="https://img.shields.io/badge/auth-zero-success.svg" alt="Zero-Auth"></a>
 </p>
 
+---
+
+**看机会 · Open to Opportunities｜深圳 · 香港 · 远程**
+
+我是 Simon，专注于 AI Agent 与实用工具开发，目前在看深圳、香港或远程的机会，欢迎联系：[simonlin0423@gmail.com](mailto:simonlin0423@gmail.com)
+
+I'm Simon, building AI agents and practical tools. Currently open to opportunities in Shenzhen, Hong Kong, or remote — feel free to reach out: [simonlin0423@gmail.com](mailto:simonlin0423@gmail.com)
+
+---
+
 <p align="center">
   <a href="#architecture">Architecture</a> ·
   <a href="#compliance-tiers">Compliance</a> ·
@@ -37,6 +47,7 @@ A single self-contained Skill file that turns raw US stock data — scattered ac
 > Compatible with [Claude Code](https://github.com/anthropics/claude-code) · [Codex](https://github.com/openai/codex) · [OpenClaw](https://github.com/anthropics/openclaw). The Skill file is structured Markdown + embedded Python — any AI coding assistant with context injection can use it.
 
 ---
+
 
 ## Architecture
 
@@ -237,16 +248,6 @@ See [CHANGELOG.md](./CHANGELOG.md).
 ## Disclaimer
 
 This project provides data-access tools only. It is not investment advice. Investing involves risk.
-
-## Support
-
-If this saved you time, a coffee is appreciated ☕
-
-<p align="center">
-  <a href="https://buymeacoffee.com/simonlin1212"><img src="./assets/bmc-qr.png" width="180" alt="Buy Me a Coffee"></a>
-</p>
-
-Want a data endpoint that isn't here? Open an [Issue](https://github.com/simonlin1212/global-stock-data/issues); sponsors' issues go first.
 
 ## License
 
